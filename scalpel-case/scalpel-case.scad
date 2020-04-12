@@ -83,7 +83,21 @@ module scalpel_case()
             translate([wt/2+tol,-eps,wt/2+tol])
                 cube([_x-wt-2*tol,lh+2*eps,_z+2*eps-wt-2*tol]);
         }
+    
     }
+    
+    // cover
+    translate([-2*_x,0,0])
+    difference()
+    {
+        // basic shape
+        cube([_x,_y,_z]);
+        translate([-eps,-_y/2+tol-lh,-eps])
+            cube([_x+2*eps,_y,_z+2*eps]);
+        translate([wt/2-tol,-wt/2+tol,wt/2-tol])
+            cube([_x-wt+2*tol,_y,_z-wt+2*tol]);
+    }
+    
     
 }
 
