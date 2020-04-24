@@ -68,7 +68,7 @@ module power_source_travel_holder()
     left_hook();
     
     translate([c_l,0,0])
-        right_hook(0);
+        right_hook();
     
     // connector
     _l = 4*wt + c_d + c_l;
