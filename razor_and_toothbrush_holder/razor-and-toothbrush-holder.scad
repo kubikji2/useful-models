@@ -22,7 +22,8 @@ rb_h = 25;
 
 // razor dimension
 r_x = 9;
-r_y = 9;
+//r_y = 9;
+r_y = 11;
 r_o = 5;
 r_z = 100;
 r_d = 5;
