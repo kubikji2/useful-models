@@ -20,7 +20,7 @@ f_w = 20;
 // stump depth
 f_h = 13;
 
-//
+// screw hole parameters
 sh_d = 3.5;
 sh_D = 6.8;
 
