@@ -36,15 +36,90 @@ g_l = 9;
 // comb width
 c_w = g_l-pt_sd;
 
+// hinge paramteres
+// hinge height, e.g. distance from the one hole end to another
+h_h = 12;
+// hinge diameter, e.g. diameter of the inner cylinder
+h_d = 2;
+// outer hinge diamter, e.g. inner cylinder plus its walls
+h_D = h_d + 4;
+
 // border parameteres
 // wall thiskness
 w_t = 2;
 // additional border height, e.g. additional distance from the top most part of pipette tips.
-b_h = 6;
+// must be at least as big as the hinge outer diameters for hinges to fit
+b_h = h_D;
 
 // door parameters
 // door reinforcement in y axis
 drf_y = 5;
+
+// hinge end reinforcement
+//h_r = 5;
+
+// outer hinbe
+module outer_hinge()
+{
+    rotate([-90,0,0])
+    {
+        // incerface part
+        cube([h_h,h_D,w_t]);
+        // main body
+        difference()
+        {
+            // no idea to be honest -- do not remeber writing that part
+            union()
+            {
+                union()
+                {
+                    translate([0,0,w_t]) cube([h_h/4,h_D,h_D/2]);
+                    translate([0,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+                        cylinder(h=h_h/4,d=h_D);
+                }
+                
+                translate([h_h-h_h/4,0,0])
+                union()
+                {
+                    translate([0,0,w_t]) cube([h_h/4,h_D,h_D/2]);
+                    translate([0,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+                        cylinder(h=h_h/4,d=h_D);
+                }
+            }
+            
+            translate([-eps,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+                cylinder(h=h_h+2*eps,d=h_d+t_tol);
+            
+        }
+    }
+        
+}
+
+
+// inner hinge
+module inner_hinge(l=1)
+{
+    {
+        // main
+        translate([h_h/4+tol,0,0])
+        difference()
+        {
+            union()
+            {
+                translate([0,h_D/2,w_t+tol/2])
+                    cube([h_h/2-2*tol,h_D/2+tol+l,h_D/2]);
+                translate([0,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+                    cylinder(h=h_h/2-2*tol,d=h_D-tol);
+            }
+                       
+            translate([-eps,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+                cylinder(h=h_h/2+2*eps-2*tol,d=h_d+0.5);
+            
+            
+            
+        }
+    }
+}
 
 
 module ptsr()
@@ -124,11 +199,10 @@ module ptsr()
        
 
     
-    /*    
     // hinges
-    translate([0,y-w_t,z]) hinge();
-    translate([x-h_h,y-w_t,z]) hinge();
-    */
+    translate([0,y-w_t,z]) outer_hinge();
+    translate([x-h_h,y-w_t,z]) outer_hinge();
+    
     // pipet tips
     /*
     for(i=[0:n_rows-1])
@@ -144,6 +218,7 @@ module ptsr()
 
 ptsr();
 
+/*
 module comb()
 {
     
@@ -179,6 +254,6 @@ module comb()
     }
     
 }
-
+*/
 
 
