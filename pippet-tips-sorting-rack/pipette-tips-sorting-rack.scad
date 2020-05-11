@@ -18,15 +18,23 @@ pt_h = 15;
 // pipette tips upper height, e.g. distance from the flat annulus to the top of the pipette
 pt_uh = 28;
 
+// comb carriage parameter
+// comb carriage height, e.g. distance from the bottom to the lower part of the carriage
+cc_h = 2;
+// comb carriage thickness
+cc_t = 3;
 
 // grid paramaters parameters
 n_rows = 8;
 n_cols = 12;
 // height of the grid
-g_h = 1;
+g_h = 2*cc_h+cc_t;
 // distance between centers
 g_l = 9;
 
+// comb paramters
+// comb width
+c_w = g_l-pt_sd;
 
 // border parameteres
 // wall thiskness
@@ -34,10 +42,16 @@ w_t = 2;
 // additional border height, e.g. additional distance from the top most part of pipette tips.
 b_h = 6;
 
+// door parameters
+// door reinforcement in y axis
+drf_y = 5;
+
+
 module ptsr()
 {
     x = n_cols*g_l + 2*w_t;
-    y = 2*(n_rows*g_l) + w_t;
+    // TODO add more reinforcement to the door area
+    y = w_t +2*(n_rows*g_l) + drf_y;
     z = g_h + pt_uh + b_h;
     off = pt_ud;
     
@@ -48,11 +62,11 @@ module ptsr()
         
         
         // main cut
-        #translate([w_t, w_t, z+eps])
+        translate([w_t, w_t, z+eps])
         hull()
         {
             _x = x-2*w_t;
-            _y = y-w_t;
+            _y = 2*(n_rows*g_l);
             _z = pt_uh-pt_h+b_h+2*eps;
             points = [  [0,off,-_z],
                         [0,0,0],
@@ -75,8 +89,8 @@ module ptsr()
             {
                 translate([0,_y,0])
                     cylinder(d=pt_sd,h=g_h+2*eps);
-                translate([0,y+4*w_t+2*tol,0])
-                    cylinder(d=ft_sd,h=g_h+2*eps);
+                translate([0,y+4*w_t+2*f_tol,0])
+                    cylinder(d=pt_sd,h=g_h+2*eps);
             }
             
             // upper cut for the pipette tips
@@ -84,7 +98,7 @@ module ptsr()
             {
                 translate([0,_y,0])
                     cylinder(d=pt_ud,h=pt_uh+2*eps);
-                translate([0,y+4*w_t+2*tol,0])
+                translate([0,y+4*w_t+2*f_tol,0])
                     cylinder(d=pt_ud,h=pt_uh+2*eps);
             }
             // cut for border
@@ -92,54 +106,25 @@ module ptsr()
                 cylinder(h=pt_uh+b_h,d=pt_ud);
         }
         
+        // cut holes for the comb
+        translate([-eps, y,cc_h])
+        {
+            for(i=[1:n_rows-1])
+            {
+                _y = -i*g_l-c_w/2;
+                translate([0,_y-f_tol,-f_tol])
+                    cube([x+2*eps,c_w+2*f_tol,cc_t+2*f_tol]);
+            }
+        }
+        
     }
     
     // brim cheater
     translate([0,y-2*w_t,0]) cube([x,2*w_t,0.21]);
-    
-    
-    /*
-    // legs    
-    _t = g_l-ft_sd; 
-    
-    // front legs
-    translate([0,+2*_t,0]) rotate([0,0,-90])
-    {
-        leg_holder(t=_t);
-        translate([0,0,-2*_t]) %leg(t=_t);
-    }
-    translate([x,+2*_t,0]) rotate([0,0,90])
-    {
-        leg_holder(t=_t);
-        translate([0,0,-2*_t]) %leg(t=_t);
-    }
+       
 
-    // back legs
-    _off = ft_ud/2+ft_sd/2+_t/2+tol;
-    translate([0,y-_off,0]) rotate([0,0,-90])
-    {
-        leg_holder(t=_t);
-        translate([0,0,-2*_t]) %leg(t=_t);
-    }
-    translate([x,y-_off,0]) rotate([0,0,90])
-    {
-        leg_holder(t=_t);
-        translate([0,0,-2*_t]) %leg(t=_t);
-    }
     
-    // middle legs
-    translate([0,y-_off-g_l*(n_rows-2),0]) rotate([0,0,-90])
-    {
-        leg_holder(t=_t);
-        translate([0,0,-2*_t]) %leg(t=_t);
-    }
-    
-    translate([x,y-_off-g_l*(n_rows-2),0]) rotate([0,0,90])
-    {
-        leg_holder(t=_t);
-        translate([0,0,-2*_t]) %leg(t=_t);
-    }
-    
+    /*    
     // hinges
     translate([0,y-w_t,z]) hinge();
     translate([x-h_h,y-w_t,z]) hinge();
@@ -158,3 +143,42 @@ module ptsr()
 }
 
 ptsr();
+
+module comb()
+{
+    
+    // comb parameters
+    _c_d = 10;
+    _x = (n_rows-1)*g_l+_c_d + ft_sd;
+    _y = 15;
+    _z = g_l-ft_sd;
+    
+    // middle part
+    round_cube(x=_x,y=_y,z=_z, d=_c_d);
+    
+    // comb teeth
+    for(i=[0:n_rows-2])
+    {
+        // tooth body
+        _x_o = ft_sd + _c_d/2 + i*g_l;
+        _y_o = _y;
+        _x = g_l-ft_sd;
+        _y = (n_cols+i)*g_l+2*w_t+2*(g_l-ft_sd);
+        _z = _x;
+        translate([_x_o,_y_o,0]) cube([_x,_y,_z]);
+                    
+        // enamel
+        translate([_x_o,_y_o+_y,0])
+        hull()
+        {
+            cylinder(d=0.01,h=_z);
+            translate([_x,0,0]) cylinder(d=0.01,h=_z);
+            translate([_x,2*_x,0]) cylinder(d=0.01,h=_z);
+        }
+            
+    }
+    
+}
+
+
+
