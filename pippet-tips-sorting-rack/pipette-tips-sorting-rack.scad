@@ -35,6 +35,9 @@ g_l = 9;
 // comb paramters
 // comb width
 c_w = g_l-pt_sd;
+// commb handle diameter
+c_hd = 10;
+
 
 // hinge paramteres
 // hinge height, e.g. distance from the one hole end to another
@@ -239,42 +242,41 @@ ptsr();
         door();
 */
 
-/*
+
 module comb()
 {
-    
-    // comb parameters
-    _c_d = 10;
-    _x = (n_rows-1)*g_l+_c_d + ft_sd;
-    _y = 15;
-    _z = g_l-ft_sd;
-    
     // middle part
-    round_cube(x=_x,y=_y,z=_z, d=_c_d);
-    
-    // comb teeth
-    for(i=[0:n_rows-2])
+    translate([-c_hd/2,w_t +2*(n_rows*g_l) + drf_y-g_l/2, cc_h])
+    hull()
     {
-        // tooth body
-        _x_o = ft_sd + _c_d/2 + i*g_l;
-        _y_o = _y;
-        _x = g_l-ft_sd;
-        _y = (n_cols+i)*g_l+2*w_t+2*(g_l-ft_sd);
-        _z = _x;
-        translate([_x_o,_y_o,0]) cube([_x,_y,_z]);
-                    
-        // enamel
-        translate([_x_o,_y_o+_y,0])
-        hull()
-        {
-            cylinder(d=0.01,h=_z);
-            translate([_x,0,0]) cylinder(d=0.01,h=_z);
-            translate([_x,2*_x,0]) cylinder(d=0.01,h=_z);
-        }
-            
+        cylinder(d=c_hd,h=cc_t);
+        translate([0,-((n_rows-1)*g_l),0])
+            cylinder(d=c_hd, h=cc_t);
+        
     }
     
+    // comb teeth
+    translate([-eps, w_t +2*(n_rows*g_l) + drf_y, cc_h])
+        {
+            for(i=[1:n_rows-1])
+            {
+                _x = n_cols*g_l + 2*w_t;
+                _y = -i*g_l-c_w/2;
+                translate([0,_y,0])
+                    cube([_x+2*eps+i*g_l,c_w,cc_t]);
+                
+                // enamel
+                translate([_x+2*eps+i*g_l,_y,0])
+                hull()
+                {
+                    cylinder(d=0.01,h=cc_t);
+                    translate([0,c_w,0]) cylinder(d=0.01,h=cc_t);
+                    translate([g_l,0,0]) cylinder(d=0.01,h=cc_t);
+                }
+            
+            }
+        }
 }
-*/
 
+translate([-g_l/2,0,0])comb();
 
