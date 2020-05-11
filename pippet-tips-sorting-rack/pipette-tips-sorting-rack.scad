@@ -73,26 +73,41 @@ module outer_hinge()
             {
                 union()
                 {
-                    translate([0,0,w_t]) cube([h_h/4,h_D,h_D/2]);
-                    translate([0,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+                    translate([0,0,w_t]) cube([h_h/4,h_D,h_D/2+f_tol]);
+                    translate([0,h_D/2,h_D/2+w_t+f_tol]) rotate([0,90,0])
                         cylinder(h=h_h/4,d=h_D);
                 }
                 
                 translate([h_h-h_h/4,0,0])
                 union()
                 {
-                    translate([0,0,w_t]) cube([h_h/4,h_D,h_D/2]);
-                    translate([0,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+                    translate([0,0,w_t]) cube([h_h/4,h_D,h_D/2+f_tol]);
+                    translate([0,h_D/2,h_D/2+w_t+f_tol]) rotate([0,90,0])
                         cylinder(h=h_h/4,d=h_D);
                 }
             }
             
-            translate([-eps,h_D/2,h_D/2+w_t]) rotate([0,90,0])
+            translate([-eps,h_D/2,h_D/2+w_t+f_tol]) rotate([0,90,0])
                 cylinder(h=h_h+2*eps,d=h_d+t_tol);
             
         }
     }
         
+}
+
+module door()
+{
+    _l = 0.5;
+    
+    x = n_cols*g_l+2*w_t;
+    y = h_D/2;
+    z = g_h + pt_uh-_l;
+    //echo(z);
+    
+    rotate([-90,0,0]) cube([x,y,z]);
+    
+    translate([0,-h_D-_l,-h_D+h_d/2-f_tol/2]) inner_hinge(l=_l);
+    translate([x-h_h,-h_D-_l,-h_D+h_d/2-f_tol/2]) inner_hinge(l=_l);
 }
 
 
@@ -101,19 +116,19 @@ module inner_hinge(l=1)
 {
     {
         // main
-        translate([h_h/4+tol,0,0])
+        translate([h_h/4+f_tol,0,0])
         difference()
         {
             union()
             {
-                translate([0,h_D/2,w_t+tol/2])
-                    cube([h_h/2-2*tol,h_D/2+tol+l,h_D/2]);
+                translate([0,h_D/2,w_t+f_tol/2])
+                    cube([h_h/2-2*f_tol,h_D/2+f_tol+l,h_D/2]);
                 translate([0,h_D/2,h_D/2+w_t]) rotate([0,90,0])
-                    cylinder(h=h_h/2-2*tol,d=h_D-tol);
+                    cylinder(h=h_h/2-2*f_tol,d=h_D-f_tol);
             }
                        
             translate([-eps,h_D/2,h_D/2+w_t]) rotate([0,90,0])
-                cylinder(h=h_h/2+2*eps-2*tol,d=h_d+0.5);
+                cylinder(h=h_h/2+2*eps-2*f_tol,d=h_d+0.5);
             
             
             
@@ -217,6 +232,12 @@ module ptsr()
 }
 
 ptsr();
+
+/*
+%translate([0,2*n_rows*g_l+w_t+drf_y+h_D/2+f_tol,g_h + pt_uh-f_tol])
+    rotate([-90,0,0])
+        door();
+*/
 
 /*
 module comb()
