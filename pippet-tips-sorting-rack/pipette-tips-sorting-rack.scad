@@ -213,10 +213,70 @@ module ptsr()
     }
     
     // brim cheater
-    translate([0,y-2*w_t,0]) cube([x,2*w_t,0.21]);
-       
-
+    //translate([0,y-2*w_t,0]) cube([x,2*w_t,0.21]);
     
+    // insert carriages
+    _ic_d = 2*w_t+(g_l-pt_sd);
+    translate([0 ,w_t +2*(n_rows*g_l) + drf_y-g_l/2,0])
+    {
+        hull()
+        {
+            cylinder(d=_ic_d,h=cc_h-f_tol);
+            translate([0,-((n_rows-1)*g_l),0])
+                cylinder(d=_ic_d, h=cc_h-f_tol);
+        }
+        
+        translate([0,0,cc_h-f_tol])
+        {
+            for(i=[1:n_rows-1])
+            {
+                _x = n_cols*g_l + 2*w_t;
+                _y = -i*g_l-c_w/2-f_tol/2-4*eps;
+                
+                // teeth
+                translate([0,_y,0])
+                hull()
+                {
+                    _d = g_l - c_w-2*f_tol-2*eps;
+                    _h = cc_t+2*f_tol;
+                    cylinder(d=0.01,h=_h);
+                    translate([0,_d,0]) cylinder(d=0.01,h=_h);
+                    translate([-_ic_d/2,_d/2,0]) cylinder(d=0.01,h=_h);
+                }
+            
+            }
+        }
+    }
+    
+    translate([x,w_t +2*(n_rows*g_l) + drf_y-g_l/2,0])
+    {
+        hull()
+        {
+            cylinder(d=_ic_d,h=cc_h-f_tol);
+            translate([0,-((n_rows-1)*g_l),0])
+                cylinder(d=_ic_d, h=cc_h-f_tol);
+        }
+        
+        translate([0,0,cc_h-f_tol])
+        {
+            for(i=[1:n_rows-1])
+            {
+                _x = n_cols*g_l + 2*w_t;
+                _y = -i*g_l-c_w/2-f_tol/2-4*eps;
+                // teeth 
+                translate([0,_y,0])
+                hull()
+                {
+                    _d = g_l - c_w-2*f_tol-2*eps;
+                    _h = cc_t+2*f_tol;
+                    cylinder(d=0.01,h=_h);
+                    translate([0,_d,0]) cylinder(d=0.01,h=_h);
+                    translate([_ic_d/2,_d/2,0]) cylinder(d=0.01,h=_h);
+                }
+            
+            }
+        }
+    }
     // hinges
     translate([0,y-w_t,z]) outer_hinge();
     translate([x-h_h,y-w_t,z]) outer_hinge();
@@ -245,7 +305,7 @@ ptsr();
 
 module comb()
 {
-    // middle part
+    // holder part
     translate([-c_hd/2,w_t +2*(n_rows*g_l) + drf_y-g_l/2, cc_h])
     hull()
     {
@@ -278,5 +338,5 @@ module comb()
         }
 }
 
-translate([-g_l/2,0,0])comb();
+//translate([-g_l/2,0,0])comb();
 
