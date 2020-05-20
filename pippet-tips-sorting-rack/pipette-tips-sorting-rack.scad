@@ -202,7 +202,7 @@ module ptsr()
         // cut holes for the comb
         translate([-eps, y,cc_h])
         {
-            for(i=[1:n_rows-1])
+            for(i=[1:n_rows])
             {
                 _y = -i*g_l-c_w/2;
                 translate([0,_y-f_tol,-f_tol])
@@ -222,13 +222,13 @@ module ptsr()
         hull()
         {
             cylinder(d=_ic_d,h=cc_h-f_tol);
-            translate([0,-((n_rows-1)*g_l),0])
+            translate([0,-((n_rows)*g_l),0])
                 cylinder(d=_ic_d, h=cc_h-f_tol);
         }
         
         translate([0,0,cc_h-f_tol])
         {
-            for(i=[1:n_rows-1])
+            for(i=[0:n_rows])
             {
                 _x = n_cols*g_l + 2*w_t;
                 _y = -i*g_l-c_w/2-f_tol/2-4*eps;
@@ -253,13 +253,13 @@ module ptsr()
         hull()
         {
             cylinder(d=_ic_d,h=cc_h-f_tol);
-            translate([0,-((n_rows-1)*g_l),0])
+            translate([0,-((n_rows)*g_l),0])
                 cylinder(d=_ic_d, h=cc_h-f_tol);
         }
         
         translate([0,0,cc_h-f_tol])
         {
-            for(i=[1:n_rows-1])
+            for(i=[0:n_rows])
             {
                 _x = n_cols*g_l + 2*w_t;
                 _y = -i*g_l-c_w/2-f_tol/2-4*eps;
@@ -294,7 +294,7 @@ module ptsr()
     */
 }
 
-ptsr();
+%ptsr();
 
 /*
 %translate([0,2*n_rows*g_l+w_t+drf_y+h_D/2+f_tol,g_h + pt_uh-f_tol])
@@ -310,7 +310,7 @@ module comb()
     hull()
     {
         cylinder(d=c_hd,h=cc_t);
-        translate([0,-((n_rows-1)*g_l),0])
+        translate([0,-((n_rows)*g_l),0])
             cylinder(d=c_hd, h=cc_t);
         
     }
@@ -318,7 +318,7 @@ module comb()
     // comb teeth
     translate([-eps, w_t +2*(n_rows*g_l) + drf_y, cc_h])
         {
-            for(i=[1:n_rows-1])
+            for(i=[1:n_rows])
             {
                 _x = n_cols*g_l + 2*w_t;
                 _y = -i*g_l-c_w/2;
@@ -338,5 +338,5 @@ module comb()
         }
 }
 
-//translate([-g_l/2,0,0])comb();
+translate([-g_l/2,0,0])comb();
 
