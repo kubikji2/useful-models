@@ -10,13 +10,13 @@ t_tol = 0.1;
 
 // pipette tips parameters
 // pipette tips stopping diameters, e.g. diameter of small flat annulus
-pt_sd = 5;
+pt_sd = 4.9;
 // pippete tips upper diameter, e.g. maximal diameter of the whole pipette tip
 pt_ud = 7.5;
 // pippete tips height
-pt_h = 15;
+pt_h = 5;
 // pipette tips upper height, e.g. distance from the flat annulus to the top of the pipette
-pt_uh = 28;
+pt_uh = 17;
 
 // comb carriage parameter
 // comb carriage height, e.g. distance from the bottom to the lower part of the carriage
