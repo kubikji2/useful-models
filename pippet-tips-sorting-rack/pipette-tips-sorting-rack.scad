@@ -14,9 +14,9 @@ pt_sd = 4.9;
 // pippete tips upper diameter, e.g. maximal diameter of the whole pipette tip
 pt_ud = 7.5;
 // pippete tips height
-pt_h = 5;
+pt_h = 15;
 // pipette tips upper height, e.g. distance from the flat annulus to the top of the pipette
-pt_uh = 17;
+pt_uh = 17+10;
 
 // comb carriage parameter
 // comb carriage height, e.g. distance from the bottom to the lower part of the carriage
@@ -113,6 +113,7 @@ module door()
     translate([x-h_h,-h_D-_l,-h_D+h_d/2-f_tol/2]) inner_hinge(l=_l);
 }
 
+///door();
 
 // inner hinge
 module inner_hinge(l=1)
@@ -144,7 +145,8 @@ module ptsr()
 {
     x = n_cols*g_l + 2*w_t;
     // TODO add more reinforcement to the door area
-    y = w_t +2*(n_rows*g_l) + drf_y;
+    y_c = 3;
+    y = w_t +y_c*(n_rows*g_l) + drf_y;
     z = g_h + pt_uh + b_h;
     off = pt_ud;
     
@@ -159,7 +161,7 @@ module ptsr()
         hull()
         {
             _x = x-2*w_t;
-            _y = 2*(n_rows*g_l);
+            _y = y_c*(n_rows*g_l);
             _z = pt_uh-pt_h+b_h+2*eps;
             points = [  [0,off,-_z],
                         [0,0,0],
@@ -216,15 +218,21 @@ module ptsr()
     //translate([0,y-2*w_t,0]) cube([x,2*w_t,0.21]);
     
     // insert carriages
-    _ic_d = 2*w_t+(g_l-pt_sd);
-    translate([0 ,w_t +2*(n_rows*g_l) + drf_y-g_l/2,0])
+    //_ic_d = 2*w_t+(g_l-pt_sd);
+    _ic_d = 2*g_l;
+    translate([0 ,w_t +y_c*(n_rows*g_l) + drf_y-g_l/2,0])
     {
+        translate([-_ic_d/4-2,-(n_rows+0.5)*g_l,0])
+            cube([_ic_d/4+2,((n_rows+1)*g_l),cc_h-f_tol]);
+        
+        translate([-_ic_d/4-2,0,0])
         hull()
         {
-            cylinder(d=_ic_d,h=cc_h-f_tol);
+            cylinder(d=_ic_d/2,h=cc_h-f_tol);
             translate([0,-((n_rows)*g_l),0])
-                cylinder(d=_ic_d, h=cc_h-f_tol);
+                cylinder(d=_ic_d/2, h=cc_h-f_tol);
         }
+        
         
         translate([0,0,cc_h-f_tol])
         {
@@ -248,13 +256,17 @@ module ptsr()
         }
     }
     
-    translate([x,w_t +2*(n_rows*g_l) + drf_y-g_l/2,0])
+    translate([x,w_t +y_c*(n_rows*g_l) + drf_y-g_l/2,0])
     {
+        translate([0,-(n_rows+0.5)*g_l,0])
+            cube([_ic_d/4+2,((n_rows+1)*g_l),cc_h-f_tol]);
+        
+        translate([_ic_d/4+2,0,0])
         hull()
         {
-            cylinder(d=_ic_d,h=cc_h-f_tol);
+            cylinder(d=_ic_d/2,h=cc_h-f_tol);
             translate([0,-((n_rows)*g_l),0])
-                cylinder(d=_ic_d, h=cc_h-f_tol);
+                cylinder(d=_ic_d/2, h=cc_h-f_tol);
         }
         
         translate([0,0,cc_h-f_tol])
@@ -294,10 +306,11 @@ module ptsr()
     */
 }
 
-%ptsr();
+ptsr();
+
 
 /*
-%translate([0,2*n_rows*g_l+w_t+drf_y+h_D/2+f_tol,g_h + pt_uh-f_tol])
+translate([0,2*n_rows*g_l+w_t+drf_y+h_D/2+f_tol,g_h + pt_uh-f_tol])
     rotate([-90,0,0])
         door();
 */
@@ -338,5 +351,5 @@ module comb()
         }
 }
 
-translate([-g_l/2,0,0])comb();
+//translate([-g_l/2,0,0])comb();
 
