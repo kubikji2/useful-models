@@ -199,6 +199,7 @@ module ptsr()
                     translate([0,y+4*w_t+2*f_tol,0])
                         cylinder(d=pt_ud,h=pt_uh+2*eps);
                 }
+                // adding archs nexto the doors
                 difference()
                 {
                     _d = pt_ud;
@@ -231,13 +232,14 @@ module ptsr()
     //translate([0,y-2*w_t,0]) cube([x,2*w_t,0.21]);
     
     // insert carriages
-    //_ic_d = 2*w_t+(g_l-pt_sd);
     _ic_d = 2*g_l;
     translate([0 ,w_t +y_c*(n_rows*g_l) + drf_y-g_l/2,0])
     {
+        // lower inserter carriages
+        // cubic part
         translate([-_ic_d/4-2,-(n_rows+0.5)*g_l,0])
             cube([_ic_d/4+2,((n_rows+1)*g_l),cc_h-f_tol]);
-        
+        // rounded part
         translate([-_ic_d/4-2,0,0])
         hull()
         {
@@ -246,7 +248,7 @@ module ptsr()
                 cylinder(d=_ic_d/2, h=cc_h-f_tol);
         }
         
-        
+        // side triangular-like carriages
         translate([0,0,cc_h-f_tol])
         {
             for(i=[0:n_rows])
@@ -271,9 +273,11 @@ module ptsr()
     
     translate([x,w_t +y_c*(n_rows*g_l) + drf_y-g_l/2,0])
     {
+        // lower inserter carriages
+        // cubic part
         translate([0,-(n_rows+0.5)*g_l,0])
             cube([_ic_d/4+2,((n_rows+1)*g_l),cc_h-f_tol]);
-        
+        // rounded part
         translate([_ic_d/4+2,0,0])
         hull()
         {
@@ -282,6 +286,7 @@ module ptsr()
                 cylinder(d=_ic_d/2, h=cc_h-f_tol);
         }
         
+        // side triangular-like carriages
         translate([0,0,cc_h-f_tol])
         {
             for(i=[0:n_rows])
