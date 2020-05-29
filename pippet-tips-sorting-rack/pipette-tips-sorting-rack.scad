@@ -189,12 +189,25 @@ module ptsr()
             }
             
             // upper cut for the pipette tips
-            translate([_x,0,g_h]) hull()
+            translate([_x,0,g_h])
+            difference()
             {
-                translate([0,_y,0])
-                    cylinder(d=pt_ud,h=pt_uh+2*eps);
-                translate([0,y+4*w_t+2*f_tol,0])
-                    cylinder(d=pt_ud,h=pt_uh+2*eps);
+                hull()
+                {
+                    translate([0,_y,0])
+                        cylinder(d=pt_ud,h=pt_uh+2*eps);
+                    translate([0,y+4*w_t+2*f_tol,0])
+                        cylinder(d=pt_ud,h=pt_uh+2*eps);
+                }
+                difference()
+                {
+                    _d = pt_ud;
+                    translate([-_d/2,y-_d,pt_uh-_d/2])
+                        cube([_d,_d,_d/2]);
+                    translate([0,y+eps,pt_uh-_d/2])
+                        rotate([90,0,0])
+                            cylinder(h=10,d=_d);
+                }
             }
             // cut for border
             translate([_x,_y,g_h])
