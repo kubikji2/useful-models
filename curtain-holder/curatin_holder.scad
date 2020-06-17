@@ -29,7 +29,7 @@ t = 5;
 h = 75-2*b_t;
 
 // handle diameter
-h_d = 30;
+h_d = 19;
 
 // handle hole heigh
 hhh = 30;
@@ -73,7 +73,7 @@ module foot_ender()
     translate([0,0,b_t])
     difference()
     {
-        cylinder(d1=a,d2=h_d,h=b_t, $fn=6);
+        cylinder(d1=a,d2=h_d,h=b_t,$fn=6);
         translate([0,0,-eps])cylinder(d=h_d,h=b_t+2*eps);
     }
     cylinder(d=a,h=b_t,$fn=6);
