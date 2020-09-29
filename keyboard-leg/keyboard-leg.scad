@@ -2,11 +2,18 @@
 eps = 0.01;
 $fn = 90;
 
+
 // main shape parameters
+/*
 kl_d = 5.8;
 kl_x = 20;
 kl_y = 22.5;
 kl_t = 2;
+*/
+kl_d = 2.75;
+kl_x = 16.5;
+kl_y = 21.6;
+kl_t = 2.7;
 
 // cut parameters
 // cut width
@@ -15,8 +22,17 @@ c_w = 2.5;
 c_l = 10;
 
 // hinge parameters
+/*
 h_h = 3;
 h_d = 2.3;
+*/
+h_h = 2;
+h_d = 2.75;
+
+// lock parameters
+l_z = 1;
+l_y = 2;
+l_x = 0.5;
 
 module cut()
 {
@@ -87,6 +103,15 @@ module keyboard_leg()
     translate([kl_x,kl_y-kl_d/2,kl_d/2])
         rotate([-90,0,-90])
             hinge();
+    
+    // adding obscure locks to the hinges
+    translate([-l_x,kl_y-h_d-l_y,kl_t/2-l_z/2])
+        cube([l_x,l_y+h_d/2,l_z]);
+    
+    translate([kl_x,kl_y-h_d-l_y,kl_t/2-l_z/2])
+        cube([l_x,l_y+h_d/2,l_z]);
+    
+    
 
     
 }
