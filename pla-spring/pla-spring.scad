@@ -3,15 +3,15 @@ $fn = 22;
 tol = 0.2;
 
 // filament diameter
-f_d = 1.75+tol;
+f_d = 3+tol;
 
 // spring parameters
 // inner space diameter
 d = 10;
 // height
-h = 25;
+h = 40;
 // number of rotations around
-r = 8;
+r = 10;
 
 module spring()
 {
