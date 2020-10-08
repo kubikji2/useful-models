@@ -5,7 +5,7 @@ eps = 0.01;
 // wall thickness
 t = 7;
 // wall height
-h = 35;
+h = 30;
 
 
 // backpack hook parameters
@@ -32,9 +32,6 @@ hh_iw = 35+t;
 hh_io = 10;
 hh_ih = 25-hh_io;
 
-
-
-
 module backpack_hook()
 {
     points = [  [0,hh_ih+hh_io,0],
@@ -58,6 +55,30 @@ module backpack_hook()
 
 //backpack_hook();
 
+module helmet_hook()
+{
+    points = [  [0,hh_ih+hh_io,0],
+                [0,hh_io,0],
+                [hh_io,0,0],
+                [hh_iw,0,0],
+                [hh_io+hh_iw,hh_io,0],
+                [hh_io+hh_iw,hh_io+hh_ih+2*hh_ih,0],
+                [hh_io+hh_iw+18+t,hh_io+hh_ih+2*hh_ih],
+                [hh_io+hh_iw+18+t,hh_io+hh_ih],];
+    
+    for(i=[0:len(points)-2])
+    {
+        translate([-hh_io-hh_iw,-hh_ih,0])
+        hull()
+        {
+            translate(points[i]) cylinder(d=t,h=h);
+            translate(points[i+1]) cylinder(d=t,h=h);
+        }
+    }
+}
+
+//helmet_hook();
+
 module screw_block()
 {
     difference()
@@ -71,6 +92,7 @@ module screw_block()
                 translate([0,sb_l,0])
                     cylinder(d=t,h=h);
             }
+            
             // border
             translate([0,sh_bo,0])
             {
