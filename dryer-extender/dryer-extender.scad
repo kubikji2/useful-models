@@ -1,5 +1,5 @@
 $fn = 180;
-fn_o = 16;
+fn_o = $fn;
 eps = 0.01;
 tol = 0.2;
 
@@ -16,7 +16,8 @@ wt = 3;
 r_o = 140;
 r_i = r_o-wt;
 h=70+45-42;
-
+wt_i = 3;
+wt_o = 4;
 
 // additional parameters
 // border height
@@ -24,58 +25,14 @@ bh = 5;
 // border thickness
 bt = 3;
 
-module border_hole()
-{
-    difference()
-    {
-        cylinder(r=r_o, h=bh);
-        translate([0,0,-eps])
-            cylinder(r=r_i,h=bh+2*eps);
-    }
-}
+// support
+// col angle width
+ca = 5;
+// foil thickness
+ft = 1;
+// foil height
+fh = 2;
 
-module inner_cutter(_h=2*h)
-{
-    difference()
-    {
-        _r = r_i+m3_l/2-bt-tol;
-        // only one cylinder needed
-        cylinder(r=_r,h=_h);
-        
-        // first quadrant cut
-        translate([-2*_r,0,-eps])
-            cube([4*_r,2*_r,_h+2*eps]);
-        
-        // second and third quadran cut
-        translate([-2*_r,-2*_r,-eps])
-            cube([2*_r,4*_r,_h+2*eps]);
-       
-    }
-}
-
-module outer_cutter(_h=2*h)
-{
-    difference()
-    {
-        _r = r_i+m3_l-bt;
-            
-        // outer cylinder
-        cylinder(r=_r+1,h=_h);
-        
-        // inner hole
-        translate([0,0,-eps])
-            cylinder(r=_r-m3_l/2,h=_h+2*eps);
-        
-        // first quadrant cut
-        translate([-2*_r,0,-eps])
-            cube([4*_r,2*_r,_h+2*eps]);
-        
-        // second and third quadran cut
-        translate([-2*_r,-2*_r,-eps])
-            cube([2*_r,4*_r,_h+2*eps]);
-        
-    }
-}
 
 module bolt_hole()
 {
@@ -87,78 +44,199 @@ module bolt_hole()
     
     // nut
     translate([0,0,m3_hh+m3_l-3])
-        cylinder(d=m3_nd,h=m3_l,$fn=6);
+        cylinder(d=m3_nd+tol,h=m3_l,$fn=6);
 }
 
+// cut in the shape of pie slice
+module angle_cut(a_min, a_max,  h=20, d=1000)
+{
+    _h = h+2*eps;
+    _a = d;
+    
+    rotate([0,0,180-a_min])
+        translate([0,-d/2,-eps])
+            cube([_a,_a,_h]);
+    
+    rotate([0,0,-a_max])
+        translate([0,-d/2,-eps])
+            cube([_a,_a,_h]);
+}
 
-module segment()
+// cylindrical ring-like shape
+module cylinder_shell(r_i, r_o, h, fn_i=$fn, fn_o=$fn)
+{
+    difference()
+    {
+        cylinder(r=r_o,h=h,$fn=fn_o);
+        translate([0,0,-eps])
+            cylinder(r=r_i,h=h+2*eps, $fn=fn_i);
+    }
+}
+
+module nut_holes()
+{
+    rotate([0,0,180+ca/2])
+    {
+        translate([0,-r_o-wt_o,1.5*bh])
+            rotate([-90,0,0])
+                bolt_hole();
+        translate([0,-r_o-wt_o,h+bh/2])
+            rotate([-90,0,0])
+                bolt_hole();
+    }
+    
+    rotate([0,0,180-ca/2])
+    {
+        translate([0,-r_o-wt_o,1.5*bh])
+            rotate([-90,0,0])
+                bolt_hole();
+        translate([0,-r_o-wt_o,h+bh/2])
+            rotate([-90,0,0])
+                bolt_hole();
+    }
+}
+
+module col(_ri, _ro, fn_i=$fn, fn_o=$fn)
 {
     difference()
     {
         // main shape
-        cylinder(r=r_o+bt+1,h=h+2*bh,$fn=fn_o);
+        rotate([0,0,ca])
+            cylinder_shell(r_i=_ro-wt_o, r_o=_ro, h=h+2*bh, fn_i=fn_i, fn_o=fn_o);
         
-        // inner cut
-        translate([0,0,-eps])
-            cylinder(r=r_i-bt, h=h+2*bh+2*eps);
+        // cut
+        angle_cut(-ca, ca, h=h+2*bh, d=1000);
         
-        // lower hole
-        translate([0,0,-eps])
-            border_hole();
+        // holes for the nuts and bolts
+        nut_holes();
         
-        // upper hole
-        translate([0,0,h+bh+eps])
-            border_hole();
-        
-        a = 5;
-        
-        // cutting only a segment
-        rotate([0,0,a])
-            translate([-2*r_o,0,-eps])
-                cube([4*r_o, 4*r_o, 2*h]);
-        rotate([0,0,0])
-            translate([-4*r_o,-2*r_o,-eps])
-                cube([4*r_o, 4*r_o, 2*h]);
-        
-        rotate([0,0,90])
-            translate([0,0,-eps])
-                outer_cutter();
-                
-        rotate([0,0,-90+a])
-            translate([0,0,-eps])
-                inner_cutter();
-                
-        // holes for the nuts and 
-        rotate([0,0,+a/2])
-        {
-            translate([0,-r_o-bt-2,2*bh])
-                rotate([-90,0,0])
-                    bolt_hole();
-            translate([0,-r_o-bt-2,h])
-                rotate([-90,0,0])
-                    bolt_hole();
-        }
-        
-        rotate([0,0,+a/2])
-        {
-            translate([+r_o+bt+2,0,2*bh])
-                rotate([-90,0,90])
-                    bolt_hole();
-            translate([+r_o+bt+2,0,h])
-                rotate([-90,0,90])
-                    bolt_hole();
-        }
-        
-        // cut for parts
-        /*
-        rotate([0,0,0-3*(90/4)])
-            translate([-2*r_o,0,-eps])
-                cube([4*r_o, 4*r_o, 2*h]);
-        rotate([0,0,0])
-            translate([-4*r_o,-2*r_o,-eps])
-                cube([4*r_o, 4*r_o, 2*h]);
-        */
     }
 }
 
-segment();
+
+module col_o()
+{
+    _ri = r_o;
+    _ro = r_o+wt_o;
+    _fn = 360/(2*ca);
+
+    col(_ri, _ro, fn_o=_fn);
+
+}
+
+//col_o();
+
+module col_i()
+{
+    
+    _ri = r_i-wt_i;
+    _ro = r_i-tol;
+    _fn = 360/(2*ca);
+    
+    col(_ri, _ro, _fn);
+    
+    // middle part
+    translate([0,0,2*bh+tol])
+        difference()
+        {
+            
+        rotate([0,0,ca])
+            cylinder_shell(r_i=_ro-wt_o, r_o=r_o-2*tol, h=h-2*bh-2*tol);
+        
+        // cutting only certain area
+        angle_cut(-ca, ca, h=h, d=1000);
+        
+        // cutting hole for the plastic foil
+        translate([0,0,-eps])
+            difference()
+            {
+                cylinder_shell( r_i=r_i+wt/2-ft/2,
+                                r_o=r_o-wt/2+ft/2,
+                                h=h+2*bh+2*eps);
+                _a = 1000;
+                rotate([0,0,180-ca+1])
+                    translate([0,-_a/2,-eps])
+                        cube([_a,_a,h+2*bh+2*eps]);                
+            }
+            
+            translate([0,0,-eps])
+            difference()
+            {
+                cylinder_shell( r_i=r_i+wt/2-ft/2,
+                                r_o=r_o-wt/2+ft/2,
+                                h=h+2*bh+2*eps);
+                _a = 1000;
+                rotate([0,0,ca-1])
+                    translate([0,-_a/2,-eps])
+                        cube([_a,_a,h+2*bh+2*eps]);                
+            }
+        }
+    
+}
+
+//col_i();
+
+
+module arch()
+{
+    difference()
+    {
+        // main shape
+        cylinder_shell(r_i=r_i-wt_i, r_o=r_o+wt_o, h=2*bh);
+        
+        // lower shell cut
+        translate([0,0,-eps])
+            cylinder_shell(r_i=r_i, r_o=r_o, h=bh+eps);
+        
+        // upper shell cut
+        translate([0,0,2*bh-fh])
+        {
+            difference()
+            {
+                cylinder_shell(r_i=r_i+wt/2-ft/2, r_o=r_o-wt/2+ft/2, h=fh+eps);
+                angle_cut(ca-1, 91-ca,  h=2*bh+2*eps, d=1000);               
+            }
+            
+        }
+        
+        // cutting only one quadrant
+        angle_cut(1, 89,  h=20, d=1000);
+        
+        // screw holes
+        nut_holes();
+        rotate([0,0,-90]) nut_holes();
+        
+        // inner cut
+        translate([0,0,-eps])
+        difference()
+        {
+            cylinder_shell(r_i=r_i-wt_i-eps, r_o=r_i+tol, h=2*bh+2*eps);
+            angle_cut(-ca, ca+0.1,  h=2*bh+2*eps, d=1000);
+        }
+        
+        // outer cut
+        translate([0,0,-eps])
+        difference()
+        {
+            cylinder_shell(r_i=r_o-tol, r_o=r_o+wt_o+eps, h=2*bh+2*eps);
+            angle_cut(-ca, ca+0.1,  h=2*bh+2*eps, d=1000);
+        }
+        
+        // inner cut
+        translate([0,0,-eps])
+        difference()
+        {
+            cylinder_shell(r_i=r_i-wt_i-eps, r_o=r_i+tol, h=2*bh+2*eps);
+            angle_cut(90-ca-0.1, 90+ca,  h=2*bh+2*eps, d=1000);
+        }
+        
+        translate([0,0,-eps])
+        difference()
+        {
+            cylinder_shell(r_i=r_o-tol, r_o=r_o+wt_o+eps, h=2*bh+2*eps);
+            angle_cut(90-ca-0.1, 90+ca,  h=2*bh+2*eps, d=1000);
+        }
+    }
+}
+
+arch();
