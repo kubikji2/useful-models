@@ -51,7 +51,7 @@ module s_hole()
     _h = m3_shd-m3_d;
     cylinder(d1=m3_shd,d2=m3_sd,h=_h/2);
     // body
-    cylinder(d=m3_d,h=m3_sl);
+    cylinder(d=m3_sd,h=m3_sl);
 }
 
 // hole for the huge screw
@@ -213,7 +213,7 @@ module upper_upper_connector()
             connector_base(1);
             
             // plexiglass hooks
-            translate([c_a/2-pg_wt,-c_a/2-pg_wt,c_h/2])
+            translate([c_a/2-pg_wt,-c_a/2,c_h/2])
                 difference()
                 {
                     rotate([0,90,0])
