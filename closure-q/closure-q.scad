@@ -275,7 +275,7 @@ module outer_hinge(h,right=0)
     
     // bolt reinforcement
     translate([0,0,h-ft_h+m3_l/2+z_tol+m3_nh])
-        rotate([0,0,0])
+        rotate([180,0,0])
             bn_hole();
 }
 
@@ -432,8 +432,7 @@ module lower_upper_back_connector()
     
 }
 
-translate([0,100,0])
-    lower_upper_back_connector();
+
 
 module lower_upper_front_left_connector()
 {
@@ -454,5 +453,58 @@ module lower_upper_front_left_connector()
             pg_holder();
 }
 
-translate([200,0,0])
+module lower_upper_front_right_connector()
+{
+    difference()
+    {
+        // main shape
+        lower_upper_connector();
+        
+        // hinge hole
+        translate([-c_a/2+h_od/2,-c_a/2+h_od/2,ft_h-hh_ob+eps])
+            outer_hinge(h=hh_ob,right=1);
+        
+    }
+    
+    // left plexiglass holder
+    translate([c_a/2,c_a/2-pg_wt,0])
+        rotate([0,0,90])
+            pg_holder();
+}
+
+
+// middle connectors
+translate([0,200,0])
+    lower_upper_back_connector();
+
+translate([0,100,0])
     lower_upper_front_left_connector();
+
+translate([100,100,0])
+    lower_upper_front_right_connector();
+
+// module for the lowest part screwed to the table bellow
+// '-> TODO carve hole for the PSU cable, bigger then previous
+module lowest_part()
+{
+    difference()
+    {
+        // main body
+        union()
+        {
+            translate([-c_a/2,-c_a/2,0])
+                rc_cube([c_a,c_a,ft_t],2);
+            translate([0,0,ft_t])
+                cylinder(d1=ft_Di,d2=ft_di,h=ft_chi);
+        }
+        
+        // hole for the screw
+        translate([0,0,eps+c_h-(c_h-ft_chi-ft_t)])
+            rotate([180,0,0])
+                huge_screw_hole(hhd_b);
+        
+    }
+}
+
+translate([200,0,0])
+lowest_part();
