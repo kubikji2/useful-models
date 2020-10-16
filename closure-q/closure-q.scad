@@ -65,6 +65,13 @@ hh_it = 18;
 // top hinge outer height
 hh_ot = hh_it + z_tol;
 
+// hinga diameters
+h_id = 9;
+h_od = h_id + 0.5;
+h_iD = h_id + 6;
+h_oD = h_od + 6;
+
+
 // hole for the m3 nuts and bolt
 module bn_hole()
 {
@@ -79,6 +86,7 @@ module bn_hole()
         cylinder(d=m3_hd, h=m3_l);
 }
 
+
 // hole for the 3mm screws
 module s_hole()
 {
@@ -89,6 +97,7 @@ module s_hole()
     cylinder(d=m3_sd,h=m3_sl);
 }
 
+
 // hole for the huge screw
 module huge_screw_hole(hh)
 {
@@ -97,6 +106,7 @@ module huge_screw_hole(hh)
     // head
     cylinder(d=14,h=hh);
 }
+
 
 // round corner cube module
 module rc_cube(size,r)
@@ -124,6 +134,8 @@ module rc_cube(size,r)
         cube([a,b-2*r,c]);
 }
 
+
+
 // module creating sube with top/buttom sloped side
 module ss_cube(size,sh)
 {
@@ -147,6 +159,7 @@ module ss_cube(size,sh)
     }    
 }
 
+
 module ses_cube(size,sh)
 {
     render(3)
@@ -163,6 +176,7 @@ module ses_cube(size,sh)
     }
     
 }
+
 
 // plexiglass holder
 module pg_holder()
@@ -183,6 +197,7 @@ module pg_holder()
     
 }
 
+
 // basic shape of the connector
 module connector_base(off=0)
 {
@@ -197,6 +212,7 @@ module connector_base(off=0)
     }
 }
 
+
 module bolt_holes()
 {
     pos = [ [-c_a/2+m3_off,-c_a/2+m3_off,0],
@@ -210,6 +226,7 @@ module bolt_holes()
             bn_hole();
     }
 }
+
 
 
 module screw_holes(off=0)
@@ -236,10 +253,30 @@ module screw_holes(off=0)
     
 }
 
+
 // main hinge 
-module outer_hinge(h)
+module outer_hinge(h,right=0)
 {
+    // main hinge axle
+    difference()
+    {
+        rotate([0,0,right*90])
+        union()
+        {
+            cylinder(d=h_oD,h=h);
+            //translate([])
+            cube([h_oD/2,h_oD/2,h]);
+            translate([-h_oD/2,-h_oD/2,0])
+                cube([h_oD/2,h_oD/2,h]);
+        }
+        translate([0,0,-eps])
+            cylinder(d=h_od,h=h+2*eps);
+    }
     
+    // bolt reinforcement
+    translate([0,0,h-ft_h+m3_l/2+z_tol+m3_nh])
+        rotate([0,0,0])
+            bn_hole();
 }
 
 
@@ -356,6 +393,9 @@ translate([100,0,0])
     upper_upper_connector();
 
 
+///////////////////////
+// BASIC FOOT MODULE //
+///////////////////////
 module lower_upper_connector()
 {
     difference()
@@ -374,5 +414,45 @@ module lower_upper_connector()
     }
 }
 
-translate([100,100,0])
+// module for back table leg foots,
+// '-> carve hole for the PSU cables 
+module lower_upper_back_connector()
+{
+    // basic shape
     lower_upper_connector();
+    
+    // first plexiglass holders
+    translate([c_a/2-pg_wt,c_a/2-2*pg_wt-pg_t,0])
+        pg_holder();
+    
+    // second plexiglass holders
+    translate([-c_a/2,-c_a/2+pg_wt,0])
+        rotate([0,0,-90])
+            pg_holder();
+    
+}
+
+translate([0,100,0])
+    lower_upper_back_connector();
+
+module lower_upper_front_left_connector()
+{
+    difference()
+    {
+        // main shape
+        lower_upper_connector();
+        
+        // hinge hole
+        translate([c_a/2-h_od/2,-c_a/2+h_od/2,ft_h-hh_ob+eps])
+            outer_hinge(h=hh_ob);
+        
+    }
+    
+    // left plexiglass holder
+    translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,0])
+        rotate([0,0,90])
+            pg_holder();
+}
+
+translate([200,0,0])
+    lower_upper_front_left_connector();
