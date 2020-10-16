@@ -1,7 +1,6 @@
-
-
 $fn = 90;
 tol = 0.2;
+z_tol = 0.5;
 eps = 0.01;
 
 // connector properties
@@ -30,6 +29,42 @@ m3_off = 5;
 pg_t = 3;
 pg_wt = 2;
 
+// foot interface parameters
+// total height of the foot interface part
+ft_h = 22;
+// thickness of the part screwed to the lower table
+ft_t = 2;
+// diameter of the inner cone base
+ft_Di = 35;
+// diameter of the outer cone base
+ft_Do = ft_Di + 1;
+// diameter of the top inner cone area
+ft_di = 20;
+// diameter of the top outer cone area
+ft_do = ft_di + 1;
+// height of the inner cone
+ft_chi = 14.5;
+// height of the outer cone
+ft_cho = ft_chi + 0.5;
+
+// huge hole depths
+// absolute base, e.g. piece screwed to the table dest bellow
+hhd_b = 5;
+// middle piece on the foot of the table leg
+hhd_m = 4;
+// top part connected to the top desk
+hhd_t = 3;
+
+// hinge parameters
+// bottom hinge inner height
+hh_ib = 16;
+// bottom hinge outer height
+hh_ob = hh_ib + z_tol;
+// top hinge inner height
+hh_it = 18;
+// top hinge outer height
+hh_ot = hh_it + z_tol;
+
 // hole for the m3 nuts and bolt
 module bn_hole()
 {
@@ -55,12 +90,12 @@ module s_hole()
 }
 
 // hole for the huge screw
-module huge_screw_hole()
+module huge_screw_hole(hh)
 {
     // body
     cylinder(d=7, h=c_h);
     // head
-    cylinder(d=14,h=3);
+    cylinder(d=14,h=hh);
 }
 
 // round corner cube module
@@ -201,6 +236,12 @@ module screw_holes(off=0)
     
 }
 
+// main hinge 
+module outer_hinge(h)
+{
+    
+}
+
 
 module upper_upper_connector()
 {
@@ -224,7 +265,7 @@ module upper_upper_connector()
                 }
                 
             // plexiglass hooks
-            translate([-c_a/2+2*pg_wt,c_a/2-pg_wt,c_h/2])
+            translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,c_h/2])
                 difference()
                 {
                     rotate([0,90,90])
@@ -242,7 +283,7 @@ module upper_upper_connector()
         
         // main hole cut
         translate([0,0,-c_h/2+eps])
-            huge_screw_hole();
+            huge_screw_hole(hhd_t);
         
         
         // holes for the bolts and nuts
@@ -267,7 +308,7 @@ module upper_lower_connector()
             connector_base(-1);
             
             // plexiglass hooks
-            translate([c_a/2-pg_wt,-c_a/2-pg_wt,c_wh+c_h])
+            translate([c_a/2-pg_wt,-c_a/2,c_wh+c_h])
                 difference()
                 {
                     rotate([0,90,0])
@@ -278,7 +319,7 @@ module upper_lower_connector()
                 }
                 
             // plexiglass hooks
-            translate([-c_a/2+2*pg_wt,c_a/2-pg_wt,c_wh+c_h])
+            translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,c_wh+c_h])
                 difference()
                 {
                     rotate([0,90,90])
@@ -295,7 +336,7 @@ module upper_lower_connector()
         
         // main hole cut
         translate([0,0,c_wh-eps])
-            huge_screw_hole();
+            huge_screw_hole(hhd_t);
         
         
         // holes for the bolts and nuts
@@ -313,3 +354,25 @@ upper_lower_connector();
 
 translate([100,0,0])
     upper_upper_connector();
+
+
+module lower_upper_connector()
+{
+    difference()
+    {
+        // main body
+        translate([-c_a/2,-c_a/2,0])
+            rc_cube([c_a,c_a,c_h],2);
+        
+        // conical cut
+        translate([0,0,-eps])
+            cylinder(d1=ft_Do,d2=ft_do,h=ft_cho+2*eps);
+        
+        // cut for the screw to slide in
+        translate([0,0,ft_cho])
+            huge_screw_hole(hhd_m);
+    }
+}
+
+translate([100,100,0])
+    lower_upper_connector();
