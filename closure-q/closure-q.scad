@@ -67,7 +67,7 @@ hh_it = 18;
 // top hinge outer height
 hh_ot = hh_it + z_tol;
 
-// hinga diameters
+// hinge diameters
 h_id = 9;
 h_od = h_id + 0.5;
 h_iD = h_id + 6;
@@ -202,35 +202,42 @@ module pg_holder(bt=pg_wt)
 
 
 // basic shape of the connector
-module connector_base(off=0)
+module connector_base(off=0,cut=0)
 {
+    // base part
+    translate([-c_a/2-c_wt,-c_a/2-c_wt,(off==-1 ? -off : 0 )*c_wh])
+        rc_cube([c_a+c_wt,c_a+c_wt,c_h/2],5);
     // main geometry
     render(1)
     hull()
     {
+        _xo = (cut==-1 ? (cut)*h_oD : 0);
+        _yo = -(cut==+1 ? (cut)*h_oD : 0);
         translate([-c_a/2-c_wt,-c_a/2-c_wt,0])
-            rc_cube([c_a+c_wt,c_a+c_wt,c_h/2+c_wh],5);
+            rc_cube([c_a+c_wt+_xo,c_a+c_wt+_yo,c_h/2+c_wh],5);
         translate([-c_a/2,-c_a/2,off*5])
-            cube([c_a-5,c_a-5,c_h/2+c_wh]);
+            cube([c_a-5+_xo,c_a-5+_yo,c_h/2+c_wh]);
     }
 }
 
 
-module bolt_holes()
+module bolt_holes(generate=[1,1,1,1])
 {
     pos = [ [-c_a/2+m3_off,-c_a/2+m3_off,0],
             [-c_a/2+m3_off,+c_a/2-m3_off,0],
             [+c_a/2-m3_off,+c_a/2-m3_off],
             [+c_a/2-m3_off,-c_a/2+m3_off]];
     
-    for(p=pos)
+    for(i=[0:3])
     {
-        translate(p)
-            bn_hole();
+        p=pos[i];
+        if(generate[i]==1)
+        {
+            translate(p)
+                bn_hole();
+        }
     }
 }
-
-
 
 module screw_holes(off=0)
 {
@@ -258,19 +265,59 @@ module screw_holes(off=0)
 
 
 // main hinge 
-module outer_hinge(h,right=0)
+module outer_hinge(h,right=0,bolt_offset=0)
 {
     // main hinge axle
     difference()
     {
-        rotate([0,0,right*90])
+        
         union()
         {
-            cylinder(d=h_oD,h=h);
-            //translate([])
-            cube([h_oD/2,h_oD/2,h]);
-            translate([-h_oD/2,-h_oD/2,0])
+            rotate([0,0,0*90])
+            {
+                cylinder(d=h_oD,h=h);
+                    
                 cube([h_oD/2,h_oD/2,h]);
+                translate([-h_oD/2,-h_oD/2,0])
+                    cube([h_oD/2,h_oD/2,h]);
+            }
+            
+            // cutting off the outer support wall
+            rotate([0,0,(-right)*90])
+            {
+                translate([-h_oD/2,-h_oD/2-c_wt,0])
+                    cube([h_oD+eps,c_wt+h_oD/2,h]);
+                translate([-h_oD/2,-h_oD/2-c_wt-eps,0-(c_h-h)/2-eps])
+                    cube([h_oD,c_wt+eps,c_h+2*eps]);
+            }
+        }
+        translate([0,0,-eps])
+            cylinder(d=h_od,h=h+2*eps);
+    }
+    
+    // bolt reinforcement
+    translate([0,0,h-ft_h+m3_l/2+z_tol+m3_nh+bolt_offset])
+        rotate([180,0,0])
+            bn_hole();
+}
+
+
+module outer_hinge_simple(h,right=0)
+{
+    // main hinge axle
+    difference()
+    {
+        
+        union()
+        {
+            rotate([0,0,right*90])
+            {
+                cylinder(d=h_oD,h=h);
+                    
+                cube([h_oD/2,h_oD/2,h]);
+                translate([-h_oD/2,-h_oD/2,0])
+                    cube([h_oD/2,h_oD/2,h]);
+            }
         }
         translate([0,0,-eps])
             cylinder(d=h_od,h=h+2*eps);
@@ -282,7 +329,10 @@ module outer_hinge(h,right=0)
             bn_hole();
 }
 
-
+/********************
+* UPPER CONNECTOTRS *
+********************/
+// REGULAR UPPER CONNECTORS (BACK)
 module upper_upper_connector()
 {
     difference()
@@ -332,7 +382,6 @@ module upper_upper_connector()
         // holes for the screws
         screw_holes(c_h/2);
     }
-    
 
 }
 
@@ -387,14 +436,267 @@ module upper_lower_connector()
         screw_holes();
     }
     
+}
+
+// LEFT FRONT CONNECTOR
+module left_upper_upper_connector()
+{
+    difference()
+    {
+        // basic shape and the plexiglass hooks
+        union()
+        {
+            // connector base
+            connector_base(off=1,cut=-1);
+                         
+            // plexiglass hooks
+            translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,c_h/2])
+                difference()
+                {
+                    rotate([0,90,90])
+                        pg_holder();
+                    _a = c_h;
+                    translate([eps-_a,-eps,-_a-eps])
+                        cube([_a,_a,_a/2+eps]);
+                }
+        }
+        
+        render(2)
+        difference()
+        {
+            // cut for the table leg
+            translate([-c_a/2,-c_a/2,c_h/2])
+                ses_cube([c_a+eps,c_a+eps,2*c_wh+eps],-3);
+            
+            // hinge reinforcement
+            hr = h_oD+2;
+            translate([c_a/2-hr,-c_a/2,0])
+                cube([hr,hr,c_h/2]);
+        }
+        
+        // main hole cut
+        translate([0,0,-c_h/2+eps])
+            huge_screw_hole(hhd_t);
+        
+        
+        // holes for the bolts and nuts
+        bolt_holes([1,1,1,0]);
+        
+        // holes for the screws
+        screw_holes(c_h/2);
+        
+        // hinge cut
+        translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,-c_h/2+(c_h-hh_ob)/2])
+            outer_hinge(h=hh_ob,right=0,bolt_offset=(c_h-m3_l)/2);
+    }
+
+}
+
+
+module left_upper_lower_connector()
+{
+    difference()
+    {
+        // basic shape and the plexiglass hooks
+        union()
+        {
+            
+            // connector base
+            connector_base(off=-1,cut=-1);
+                                   
+            // plexiglass hooks
+            translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,c_wh+c_h])
+                difference()
+                {
+                    rotate([0,90,90])
+                        pg_holder();
+                    _a = c_h+2*eps;
+                    translate([eps-_a,-eps,-_a+c_h/2+eps])
+                        cube([_a,_a,_a/2+eps]);
+                }
+            
+        }
+        
+        // cut for the table leg
+        render(2)
+        difference()
+        {
+            translate([-c_a/2,-c_a/2,-c_wh-eps])
+                ses_cube([c_a+eps,c_a+eps,2*c_wh+eps],3);
+            // hinge reinforcement
+            hr = h_oD+2;
+            translate([c_a/2-hr,-c_a/2,c_wh])
+                cube([hr,hr,c_h/2]);
+        }
+        
+        // main hole cut
+        translate([0,0,c_wh-eps])
+            huge_screw_hole(hhd_t);
+        
+        
+        // holes for the bolts and nuts
+        translate([0,0,c_wh+c_h/2])
+            bolt_holes([1,1,1,0]);
+        
+        // holes for the screws
+        screw_holes();
+        
+        // hinge cut
+        translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_wh+(c_h-hh_ob)/2])
+            outer_hinge(h=hh_ob,right=0,bolt_offset=(c_h-m3_l)/2);
+        
+    }
     
 }
 
-upper_lower_connector();
+
+// RIGHT FRONT CONNECTOR
+module right_upper_upper_connector()
+{
+    difference()
+    {
+        // basic shape and the plexiglass hooks
+        union()
+        {
+            // connector base
+            connector_base(off=1,cut=1);
+                         
+            // plexiglass hooks
+            translate([c_a/2-pg_wt,-c_a/2,c_h/2])
+                difference()
+                {
+                    rotate([0,90,0])
+                        pg_holder();
+                    _a = c_h;
+                    translate([-eps,-eps,-_a-eps])
+                        cube([_a,_a,_a/2+eps]);
+                }
+        }
+        
+        render(2)
+        difference()
+        {
+            // cut for the table leg
+            translate([-c_a/2,-c_a/2,c_h/2])
+                ses_cube([c_a+eps,c_a+eps,2*c_wh+eps],-3);
+            
+            // hinge reinforcement
+            hr = h_oD+2;
+            translate([-c_a/2,c_a/2-hr,0])
+                cube([hr,hr,c_h/2]);
+        }
+        
+        // main hole cut
+        translate([0,0,-c_h/2+eps])
+            huge_screw_hole(hhd_t);
+        
+        
+        // holes for the bolts and nuts
+        bolt_holes([1,0,1,1]);
+        
+        // holes for the screws
+        screw_holes(c_h/2);
+        
+        // hinge cut
+        translate([-c_a/2+h_oD/2,c_a/2-h_oD/2,-c_h/2+(c_h-hh_ob)/2])
+            outer_hinge(h=hh_ob,right=1,bolt_offset=(c_h-m3_l)/2);
+    }
+
+}
+
+
+
+module right_upper_lower_connector()
+{
+    difference()
+    {
+        // basic shape and the plexiglass hooks
+        union()
+        {
+            
+            // connector base
+            connector_base(off=-1,cut=1);
+                                   
+            // plexiglass hooks
+            // plexiglass hooks
+            translate([c_a/2-pg_wt,-c_a/2,c_wh+c_h])
+                difference()
+                {
+                    rotate([0,90,0])
+                        pg_holder();
+                    _a = c_h+2*eps;
+                    translate([-eps,-eps,-_a+c_h/2+eps])
+                        cube([_a,_a,_a/2+eps]);
+                }
+            
+        }
+        
+        // cut for the table leg
+        render(2)
+        difference()
+        {
+            translate([-c_a/2,-c_a/2,-c_wh-eps])
+                ses_cube([c_a+eps,c_a+eps,2*c_wh+eps],3);
+            // hinge reinforcement
+            hr = h_oD+2;
+            translate([-c_a/2,c_a/2-hr,c_wh])
+                cube([hr,hr,c_h/2]);
+        }
+        
+        // main hole cut
+        translate([0,0,c_wh-eps])
+            huge_screw_hole(hhd_t);
+        
+        
+        // holes for the bolts and nuts
+        translate([0,0,c_wh+c_h/2])
+            bolt_holes([1,0,1,1]);
+        
+        // holes for the screws
+        screw_holes();
+        
+        // hinge cut
+        translate([-c_a/2+h_oD/2,c_a/2-h_oD/2,c_wh+(c_h-hh_ob)/2])
+            outer_hinge(h=hh_ob,right=1,bolt_offset=(c_h-m3_l)/2);
+        
+    }
+    
+}
+
+// back left
+translate([0,100,0])
+    rotate([0,0,-90])
+        upper_lower_connector();
+
+translate([0,100,50])
+    rotate([0,0,-90])
+        upper_upper_connector();
+
+// back right
+
+translate([100,100,0])
+    rotate([0,0,180])
+        upper_lower_connector();
+
+translate([100,100,50])
+    rotate([0,0,180])
+        upper_upper_connector();
+
+
+// front left
+translate([0,0,50])
+    left_upper_upper_connector();
+
+left_upper_lower_connector();
+
+// front left
+translate([100,0,50])
+    rotate([0,0,90])
+        right_upper_upper_connector();
 
 translate([100,0,0])
-    upper_upper_connector();
-
+    rotate([0,0,90])
+        right_upper_lower_connector();
 
 ///////////////////////
 // BASIC FOOT MODULE //
@@ -434,9 +736,6 @@ module lower_upper_back_connector()
     
 }
 
-
-
-
 module lower_upper_front_left_connector()
 {
     difference()
@@ -446,7 +745,7 @@ module lower_upper_front_left_connector()
         
         // hinge hole
         translate([c_a/2-h_od/2,-c_a/2+h_od/2,ft_h+ft_ho-hh_ob+eps])
-            outer_hinge(h=hh_ob);
+            outer_hinge_simple(h=hh_ob);
         
     }
     
@@ -465,7 +764,7 @@ module lower_upper_front_right_connector()
         
         // hinge hole
         translate([-c_a/2+h_od/2,-c_a/2+h_od/2,ft_h+ft_ho-hh_ob+eps])
-            outer_hinge(h=hh_ob,right=1);
+            outer_hinge_simple(h=hh_ob,right=1);
         
     }
     
@@ -477,13 +776,16 @@ module lower_upper_front_right_connector()
 
 
 // middle connectors
-translate([0,200,0])
+translate([0,300,0])
     lower_upper_back_connector();
 
-translate([0,100,0])
+translate([100,300,0])
+    lowest_part();
+
+translate([0,200,0])
     lower_upper_front_left_connector();
 
-translate([100,100,0])
+translate([100,200,0])
     lower_upper_front_right_connector();
 
 // module for the lowest part screwed to the table bellow
@@ -508,6 +810,3 @@ module lowest_part()
         
     }
 }
-
-translate([200,0,0])
-lowest_part();
