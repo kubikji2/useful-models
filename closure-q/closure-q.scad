@@ -30,8 +30,10 @@ pg_t = 3;
 pg_wt = 2;
 
 // foot interface parameters
-// total height of the foot interface part
+// height of the foot interface part
 ft_h = 22;
+// additional foot height for the insulation and cable management
+ft_ho = 6;
 // thickness of the part screwed to the lower table
 ft_t = 2;
 // diameter of the inner cone base
@@ -179,7 +181,7 @@ module ses_cube(size,sh)
 
 
 // plexiglass holder
-module pg_holder()
+module pg_holder(bt=pg_wt)
 {
     difference()
     {
@@ -187,7 +189,8 @@ module pg_holder()
         hull()
         {
             // horizontal part
-            cube([c_h,pg_t+2*pg_wt,pg_wt]);
+            translate([0,0,pg_wt-bt])
+                cube([c_h,pg_t+2*pg_wt,bt]);
             // vertical part
             cube([pg_wt,pg_t+2*pg_wt,c_h]);
         }
@@ -402,7 +405,7 @@ module lower_upper_connector()
     {
         // main body
         translate([-c_a/2,-c_a/2,0])
-            rc_cube([c_a,c_a,c_h],2);
+            rc_cube([c_a,c_a,ft_h+ft_ho],2);
         
         // conical cut
         translate([0,0,-eps])
@@ -415,22 +418,22 @@ module lower_upper_connector()
 }
 
 // module for back table leg foots,
-// '-> carve hole for the PSU cables 
 module lower_upper_back_connector()
 {
     // basic shape
     lower_upper_connector();
     
     // first plexiglass holders
-    translate([c_a/2-pg_wt,c_a/2-2*pg_wt-pg_t,0])
-        pg_holder();
+    translate([c_a/2-pg_wt,c_a/2-2*pg_wt-pg_t,ft_ho])
+        pg_holder(pg_wt+ft_ho);
     
     // second plexiglass holders
-    translate([-c_a/2,-c_a/2+pg_wt,0])
+    translate([-c_a/2,-c_a/2+pg_wt,ft_ho])
         rotate([0,0,-90])
-            pg_holder();
+            pg_holder(pg_wt+ft_ho);
     
 }
+
 
 
 
@@ -442,15 +445,15 @@ module lower_upper_front_left_connector()
         lower_upper_connector();
         
         // hinge hole
-        translate([c_a/2-h_od/2,-c_a/2+h_od/2,ft_h-hh_ob+eps])
+        translate([c_a/2-h_od/2,-c_a/2+h_od/2,ft_h+ft_ho-hh_ob+eps])
             outer_hinge(h=hh_ob);
         
     }
     
     // left plexiglass holder
-    translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,0])
+    translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,ft_ho])
         rotate([0,0,90])
-            pg_holder();
+            pg_holder(pg_wt+ft_ho);
 }
 
 module lower_upper_front_right_connector()
@@ -461,15 +464,15 @@ module lower_upper_front_right_connector()
         lower_upper_connector();
         
         // hinge hole
-        translate([-c_a/2+h_od/2,-c_a/2+h_od/2,ft_h-hh_ob+eps])
+        translate([-c_a/2+h_od/2,-c_a/2+h_od/2,ft_h+ft_ho-hh_ob+eps])
             outer_hinge(h=hh_ob,right=1);
         
     }
     
     // left plexiglass holder
-    translate([c_a/2,c_a/2-pg_wt,0])
+    translate([c_a/2,c_a/2-pg_wt,ft_ho])
         rotate([0,0,90])
-            pg_holder();
+            pg_holder(pg_wt+ft_ho);
 }
 
 
