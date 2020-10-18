@@ -229,8 +229,20 @@ module psu_holder_hole()
     translate([0,-1,0])
         cylinder( h = 10, r = 1.8, $fn=30 );
     
+    //sccrew haead cut
+    hc_h = 3.5-1.8;
+    render(0)
+    translate([0,0,10-hc_h])
+    hull()
+    {
+        translate([0,-1,0])
+            cylinder( h = hc_h, r1 = 1.8, r2=3.5, $fn=30 );
+        translate([0,1,0])
+            cylinder( h = hc_h, r1 = 1.8, r2=3.5, $fn=30 );
+    }
+    
     translate([-1.8,-1,0])
-        cube([ 3.6, 2, 10 ]);  
+        cube([ 3.6, 2, 10 ]);   
 }
 
 module PSU_HOLDER()
@@ -278,11 +290,12 @@ module PSU_HOLDER()
             
             // screw holes
             hole_off = 7;
-            translate([hole_off,by/2+2,-1])
+            translate([hole_off,by/2+2,-10+bz+0.01])
                 psu_holder_hole();
                 
-            translate([bx-hole_off,by/2+2,-1])
-                psu_holder_hole();
+            translate([bx-hole_off,by/2+2,-10+bz+0.01])
+                rotate([0,0,90])
+                     psu_holder_hole();
             
             // some wierd holes from the original part
             translate([hole_off/2+1.8,2,-0.2])
@@ -307,6 +320,9 @@ module psu_main(){
             translate([100,0.99,50/2+10]) rotate([-90,-90,0]) PSU_HOLDER();
             translate([85.5,4+15.6+0.5,39.1+13.5]) rotate([0,0,180]) nuttrap();
             translate([49,4+15.6+0.5,39+13.5]) rotate([0,0,180]) nuttrap();
+            
+            %translate([14.5,8,12.5]) rotate([0,-90,0]) m3_screw();
+            %translate([85.5,8,12.5]) rotate([0,90,0]) m3_screw();
         }   
         translate([-5,-9,-30]) cube([150,10,100]);
     }       
@@ -328,8 +344,8 @@ module upper_part()
         
         translate([-25,0,-20]) cube([150,3.5,120]);
         translate([37,9,39]) rotate([0,0,0]) m3_screw();
-        #translate([14.5,8,7.5]) rotate([0,-90,0]) m3_screw();
-        #translate([85.5,8,7.5]) rotate([0,90,0]) m3_screw();
+        #translate([14.5,8,12.5]) rotate([0,-90,0]) m3_screw();
+        #translate([85.5,8,12.5]) rotate([0,90,0]) m3_screw();
         translate([52,9,14.5]) rotate([0,180,0]) m3_screw();
         
         //version
@@ -359,19 +375,19 @@ module lower_part()
             
             // frame side wall
             translate([3.1,3,5]) cube([3,10,40]);
-            translate([5.1,3,10]) cube([3,10,10]); // moved in Q1 version
+            translate([5.1,3,7.5]) cube([3,10,10]); // moved in Q1 version
             
             // rear wall
             translate([93.9,3,5]) cube([3,10,40]);
-            translate([91.1,3,10]) cube([3,10,10]); // moved in Q1 version
+            translate([91.1,3,7.5]) cube([3,10,10]); // moved in Q1 version
             
             // switch side wall
             translate([30,3,44.5]) cube([15,11,5]);
 
             // nut inserts
             translate([32,1,44]) cube([10,1,5]);
-            translate([3,1,10]) cube([5,11,10]); // moved in Q1 version
-            translate([92,1,10]) cube([5,11,10]); // moved in Q1 version
+            //translate([3,1,10]) cube([5,11,10]); // moved in Q1 version
+            //translate([92,1,10]) cube([5,11,10]); // moved in Q1 version
             translate([45,2,3.5]) cube([15,11,5]);
             translate([46.5,1,3.5]) cube([10,2,5]);
             
@@ -385,13 +401,13 @@ module lower_part()
         }
 
     // rear side nut
-    translate([4.5,-3.4,12.2]) cube([2.3,15,5.6]); // moved in Q1 version
-    translate([-4,8,15 ]) rotate([0,90,0]) cylinder(h=15,r=1.6, $fn=30 ); // moved in Q1 version
+    translate([4.5,-3.4,12.2-2.5]) cube([2.3,15,5.6]); // moved in Q1 version
+    translate([-4,8,12.5 ]) rotate([0,90,0]) cylinder(h=15,r=1.6, $fn=30 ); // moved in Q1 version
     translate([-2,8,25 ]) rotate([0,90,0]) cylinder(h=4,r=3.1, $fn=30 ); 
     
     // frame side nut
-    translate([93,-3.4,12.2]) cube([2.3,15,5.6]); // moved in Q1 version
-    translate([88,8,15 ]) rotate([0,90,0]) cylinder(h=15,r=1.6, $fn=30 );  // moved in Q1 version
+    translate([93,-3.4,12.2-2.5]) cube([2.3,15,5.6]); // moved in Q1 version
+    translate([88,8,12.5 ]) rotate([0,90,0]) cylinder(h=15,r=1.6, $fn=30 );  // moved in Q1 version
     translate([98,8,25 ]) rotate([0,90,0]) cylinder(h=4,r=3.1, $fn=30 );
 
     // edges
@@ -418,8 +434,8 @@ module lower_part()
     // nut edges
     translate([46+2.8,1.5,4]) rotate([45,0,0]) cube([5.6,3,3]);
     translate([31.5+2.8,1.5,44.5]) rotate([45,0,0]) cube([5.6,3,3]);
-    translate([5.5,-0.5,12.2]) rotate([0,0,45]) cube([3,3,5.6]); // moved in Q1 version
-    translate([94,-0.5,12.2]) rotate([0,0,45]) cube([3,3,5.6]); // moved in Q1 version
+    translate([5.5,-0.5,12.2-2.5]) rotate([0,0,45]) cube([3,3,5.6]); // moved in Q1 version
+    translate([94,-0.5,12.2-2.5]) rotate([0,0,45]) cube([3,3,5.6]); // moved in Q1 version
     
     
     //version
