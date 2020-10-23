@@ -1,4 +1,4 @@
-$fn = 45;
+$fn = 180;
 fn_o = $fn;
 eps = 0.01;
 tol = 0.2;
@@ -21,7 +21,7 @@ wt_o = 4;
 
 // additional parameters
 // border height
-bh = 5;
+bh = 10;
 // border thickness
 bt = 3;
 
@@ -124,7 +124,7 @@ module col_o()
 
 }
 
-//col_o();
+col_o();
 
 module col_i()
 {
@@ -136,16 +136,21 @@ module col_i()
     col(_ri, _ro, _fn);
     
     // middle part
-    translate([0,0,2*bh+tol])
+    translate([0,0,bh+tol])
         difference()
         {
+            rotate([0,0,ca])
+                cylinder_shell(r_i=_ro-wt_o, r_o=r_o-2*tol, h=h-2*tol);
+
+        
+            // cutting only certain area
+            angle_cut(-ca, ca, h=h, d=1000);
             
-        rotate([0,0,ca])
-            cylinder_shell(r_i=_ro-wt_o, r_o=r_o-2*tol, h=h-2*bh-2*tol);
+            // holes for the nuts and bolts
+            translate([0,0,-bh-tol])
+                nut_holes();
         
-        // cutting only certain area
-        angle_cut(-ca, ca, h=h, d=1000);
-        
+        /*
         // cutting hole for the plastic foil
         translate([0,0,-eps])
             difference()
@@ -170,11 +175,12 @@ module col_i()
                     translate([0,-_a/2,-eps])
                         cube([_a,_a,h+2*bh+2*eps]);                
             }
+        */
+
         }
-    
 }
 
-//col_i();
+col_i();
 
 
 module arch()
@@ -206,7 +212,9 @@ module arch()
         nut_holes();
         rotate([0,0,-90]) nut_holes();
         
+        
         // inner cut
+        render(2)
         translate([0,0,-eps])
         difference()
         {
@@ -215,6 +223,7 @@ module arch()
         }
         
         // outer cut
+        render(2)
         translate([0,0,-eps])
         difference()
         {
@@ -223,6 +232,7 @@ module arch()
         }
         
         // inner cut
+        render(2)
         translate([0,0,-eps])
         difference()
         {
@@ -230,13 +240,56 @@ module arch()
             angle_cut(90-ca-0.1, 90+ca,  h=2*bh+2*eps, d=1000);
         }
         
+        render(2)
         translate([0,0,-eps])
         difference()
         {
             cylinder_shell(r_i=r_o-tol, r_o=r_o+wt_o+eps, h=2*bh+2*eps);
             angle_cut(90-ca-0.1, 90+ca,  h=2*bh+2*eps, d=1000);
         }
+        
+
+        n_cuts = 18;
+        for(i=[0:n_cuts])
+        {
+            translate([0,0,2*bh])
+                rotate([-90,0,-81+4*i])
+                    cylinder(d=4,h=2*r_o,$fn=6);
+        }
+        
+        for(i=[0:n_cuts+1])
+        {
+            translate([0,0,2*bh-3])
+                rotate([-90,0,-85+4*i+2])
+                    cylinder(d=4,h=r_i,$fn=6);
+        }
+        
+        for(i=[0:n_cuts+1])
+        {
+            translate([0,0,2*bh-3])
+                rotate([0,0,-85+4*i+2])
+                    translate([0,r_o,0])
+                        rotate([-90,0,0])
+                            cylinder(d=4,h=r_i,$fn=6);
+        }
+        
+        for(i=[0:n_cuts])
+        {
+            translate([0,0,3])
+                rotate([0,0,-81+4*i])
+                    translate([0,r_o+1,0])
+                        rotate([-90,0,0])
+                            cylinder(d=4,h=r_i,$fn=6);
+        }
+        
+        for(i=[0:n_cuts])
+        {
+            translate([0,0,3])
+                rotate([0,0,-81+4*i])
+                    rotate([-90,0,0])
+                        cylinder(d=4,h=r_i-1,$fn=6);
+        }
     }
 }
 
-arch();
+//arch();
