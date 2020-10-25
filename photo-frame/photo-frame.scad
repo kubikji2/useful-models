@@ -26,7 +26,7 @@ m2_d = 2;
 m2_hd = 3.8;
 m2_hh = 1.4;
 m2_nh = 1.5;
-m2_nd = 4.5;
+m2_nd = 4.75;
 
 module bolt_hole()
 {
@@ -40,9 +40,9 @@ module bolt_hole()
         cylinder(h=m2_l, d=m2_nd, $fn=6);
 }
 
-module bolt_holes()
+module corner_bolt_holes()
 {
-    _x = wp_x-m2_nd;
+    _x = wp_x-wt-df/2;
     _y = wp_x-tol-(df)/2;
     _z = 2*wt+gt+st+wp_y-m2_l-m2_hh;
     // left bolt
@@ -63,7 +63,6 @@ module corner()
 {
     // total z height
     _tz = wt+gt+st+wp_y+wt;
-    echo(_tz);
     difference()
     {
         union()
@@ -89,13 +88,13 @@ module corner()
             cube([2*wp_x, 2*wp_x, wt+st+gt+2*eps]);
         
         // bolt holes
-        bolt_holes();
+        corner_bolt_holes();
          
     }
     
 }
 
-module bottom()
+module corner_bottom()
 {
     translate([-wp_x,-wp_x,0])
     difference()
@@ -113,13 +112,90 @@ module bottom()
         
         // bolt holes
         translate(-1*[-wp_x,-wp_x,0])
-        bolt_holes();
+            corner_bolt_holes();
         
     }
 }
 
-bottom();
+
+/***************
+* SIDE MODULES *
+***************/
+
+module side_holes()
+{
+    _x = wp_x-df;
+    _y = wp_x-tol-(df)/2;
+    _z = 2*wt+gt+st+wp_y-m2_l-m2_hh;
+    // down bolt
+    translate([_y, -_x, _z])
+        rotate([0,0,90])
+            bolt_hole();
+    // up bolt
+    translate([_y, _x, _z])
+        rotate([0,0,90])
+            bolt_hole();
+ 
+}
 
 
+module side()
+{
+    // total z height
+    _tz = wt+gt+st+wp_y+wt;
+    difference()
+    {
+        union()
+        {
 
+            // vertical piece
+            translate([-wt,-wp_x,0])
+                cube([wt+wp_x+wt,2*wp_x,_tz]);
+        }
+        
+        // cut for the wood pieces
+        translate([0,-wp_x-eps,wt+st+gt])
+            cube([wp_x,2*wp_x+2*eps,wp_y]);
+                
+        // universal cut
+        translate([-wp_x-eps, -wp_x-eps, -eps])
+            cube([2*wp_x, 2*wp_x+2*eps, wt+st+gt+2*eps]);
+        
+        // bolt holes
+        side_holes();
+         
+    }
+}
+
+module side_bottom()
+{
+    translate([-wt,-wp_x,0])
+    difference()
+    {
+        // main shape
+        cube([wp_x+wt-tol, 2*wp_x, wt+st+gt-tol]);
+        
+        // cut for glass
+        translate([-eps, -eps, wt+st+eps])
+            cube([wp_x+wt-tol+eps-df, 2*wp_x+2*eps, gt+eps]);
+        
+        // cut for sololit
+        translate([-eps, -eps, wt+eps])
+            cube([wp_x+wt-tol+eps-df, 2*wp_x+2*eps, st+eps]);
+        
+        // bolt holes
+        translate(-1*[-wt,-wp_x,0])
+            side_holes();
+        
+    }
+}
+    
+
+side();
+
+side_bottom();
+
+/*
 corner();
+corner_bottom();
+*/
