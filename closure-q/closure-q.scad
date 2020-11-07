@@ -73,6 +73,8 @@ h_od = h_id + 0.5;
 h_iD = h_id + 6;
 h_oD = h_od + 6;
 
+// hinge frames lenght
+hf_lu = 50;
 
 // hole for the m3 nuts and bolt
 module bn_hole()
@@ -325,7 +327,7 @@ module outer_hinge_simple(h,right=0)
             }
         }
         translate([0,0,-eps])
-            cylinder(d=h_od,h=h+2*eps);
+            cylinder(d=h_id,h=h+2*eps);
     }
     
     // bolt reinforcement
@@ -754,8 +756,21 @@ module upper_hinge(right=0)
             cylinder(h=hh_it,d=h_iD);
             
             // support frame
+            translate(right ? [0,h_iD/2-2*pg_wt-pg_t,0] : [0,-h_iD/2,0])
+                cube([h_iD/2+hf_lu,pg_t+2*pg_wt,hh_it]);
             
             // support ending
+            translate(right ? [hf_lu+h_iD/2-pg_wt,h_iD/2-2*pg_wt-pg_t,0] : [hf_lu+h_iD/2-pg_wt,-h_iD/2,0])
+            render(1)
+            hull()
+            {
+                // horizontal part
+                translate([0,0,hh_it-pg_wt])
+                    cube([hh_it,pg_t+2*pg_wt,pg_wt]);
+                // vertical part
+                cube([pg_wt,pg_t+2*pg_wt,hh_it]);
+            }
+
             
         }
         
@@ -764,14 +779,23 @@ module upper_hinge(right=0)
             cylinder(h=hh_it+2*eps,d=h_od);
         
         // plexiglass hole
-        cube([h_od, h_od, hh_it]);
+        translate(right ? [h_iD/2+pg_wt,h_iD/2-pg_wt-pg_t,-pg_wt] : [h_iD/2+pg_wt,-h_iD/2+pg_wt,-pg_wt])
+            cube([hf_lu+hh_it,pg_t,hh_it]);
+        
+        // tmp cut
+        //cube([h_od, h_od, hh_it]);
     }
 }
 
-/*
-translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
-upper_hinge();
-*/
+
+translate([0,-20,0])
+    translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
+        upper_hinge();
+
+
+translate([0,-40,0])
+    translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
+        upper_hinge(right=1);
 
 ///////////////////////
 // BASIC FOOT MODULE //
@@ -865,8 +889,8 @@ translate([0,200,0])
 
 translate([100,200,0])
     lower_upper_front_right_connector();
-
 */
+
 // module for the lowest part screwed to the table bellow
 // '-> TODO carve hole for the PSU cable, bigger then previous
 module lowest_part()
