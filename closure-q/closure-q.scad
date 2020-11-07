@@ -138,7 +138,7 @@ module rc_cube(size,r)
 
 
 
-// module creating sube with top/buttom sloped side
+// module creating cube with top/buttom sloped side
 module ss_cube(size,sh)
 {
     // main cube parameters
@@ -245,14 +245,19 @@ module screw_holes(off=0)
     s_pos = [   [+c_a/2-c_wt-m3_shd,-c_a/2-c_wt-eps,off+m3_shd],
                 [-c_a/2+m3_shd,-c_a/2-c_wt-eps,off-m3_shd+c_wh],
                 [-c_a/2-c_wt-eps,-c_a/2+m3_shd,off+m3_shd],
-                [-c_a/2-c_wt-eps,+c_a/2-c_wt-m3_shd,off-m3_shd+c_wh]];
+                [-c_a/2-c_wt-eps,+c_a/2-c_wt-m3_shd,off-m3_shd+c_wh],
+                [c_a/2+c_wt+eps,+c_a/2-c_wt-m3_shd,off+m3_shd],
+                [c_a/2-c_wt-m3_shd,+c_a/2+c_wt+eps,off-m3_shd+c_wh]];
     
     // '-> rotations
     s_rot = [   [-90,0,0],
                 [-90,0,0],
                 [0,90,0],
-                [0,90,0]];
-    for(i=[0:3])
+                [0,90,0],
+                [0,-90,0],
+                [90,0,0]];
+    
+    for(i=[0:5])
     {
         cp = s_pos[i];
         cr = s_rot[i];
@@ -343,6 +348,9 @@ module upper_upper_connector()
             // connector base
             connector_base(1);
             
+            // additional support
+            leg_inner_support(upper=1);
+            
             // plexiglass hooks
             translate([c_a/2-pg_wt,-c_a/2,c_h/2])
                 difference()
@@ -385,6 +393,22 @@ module upper_upper_connector()
 
 }
 
+module leg_inner_support(upper=0)
+{
+    cut = 1;
+    translate([5,5,0])
+    render(1)
+    hull()
+    {
+        _xo = h_oD;
+        _yo = h_oD;
+        translate([-c_wt,-c_wt,0])
+            rc_cube([c_a/2+c_wt,c_a/2+c_wt,(upper == 0) ? c_h/2+c_wh : c_h/2],5);
+        translate([0,0,(upper == 0) ? -5 : 0])
+            cube([c_a/2-5,c_a/2-5,(upper == 0) ? c_h/2+c_wh : c_h/2]);
+    }
+}
+
 module upper_lower_connector()
 {
     difference()
@@ -395,6 +419,9 @@ module upper_lower_connector()
             
             // connector base
             connector_base(-1);
+            
+            // additional support
+            leg_inner_support();
             
             // plexiglass hooks
             translate([c_a/2-pg_wt,-c_a/2,c_wh+c_h])
@@ -448,7 +475,10 @@ module left_upper_upper_connector()
         {
             // connector base
             connector_base(off=1,cut=-1);
-                         
+            
+            // additional support
+            leg_inner_support(upper=1);
+            
             // plexiglass hooks
             translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,c_h/2])
                 difference()
@@ -503,6 +533,9 @@ module left_upper_lower_connector()
             
             // connector base
             connector_base(off=-1,cut=-1);
+            
+            // additional leg support
+            leg_inner_support();
                                    
             // plexiglass hooks
             translate([-c_a/2+2*pg_wt+pg_t,c_a/2-pg_wt,c_wh+c_h])
@@ -560,6 +593,9 @@ module right_upper_upper_connector()
         {
             // connector base
             connector_base(off=1,cut=1);
+            
+            // additional support
+            leg_inner_support(upper=1);
                          
             // plexiglass hooks
             translate([c_a/2-pg_wt,-c_a/2,c_h/2])
@@ -616,8 +652,10 @@ module right_upper_lower_connector()
             
             // connector base
             connector_base(off=-1,cut=1);
+            
+            // additional leg support
+            leg_inner_support();
                                    
-            // plexiglass hooks
             // plexiglass hooks
             translate([c_a/2-pg_wt,-c_a/2,c_wh+c_h])
                 difference()
@@ -663,7 +701,9 @@ module right_upper_lower_connector()
     
 }
 
+
 // back left
+/*
 translate([0,100,0])
     rotate([0,0,-90])
         upper_lower_connector();
@@ -671,7 +711,8 @@ translate([0,100,0])
 translate([0,100,50])
     rotate([0,0,-90])
         upper_upper_connector();
-
+*/
+/*
 // back right
 
 translate([100,100,0])
@@ -682,7 +723,7 @@ translate([100,100,50])
     rotate([0,0,180])
         upper_upper_connector();
 
-
+*/
 // front left
 translate([0,0,50])
     left_upper_upper_connector();
@@ -776,18 +817,22 @@ module lower_upper_front_right_connector()
 
 
 // middle connectors
+/*
 translate([0,300,0])
     lower_upper_back_connector();
-
+*/
+/*
 translate([100,300,0])
     lowest_part();
-
+*/
+/*
 translate([0,200,0])
     lower_upper_front_left_connector();
 
 translate([100,200,0])
     lower_upper_front_right_connector();
 
+*/
 // module for the lowest part screwed to the table bellow
 // '-> TODO carve hole for the PSU cable, bigger then previous
 module lowest_part()
