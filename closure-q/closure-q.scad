@@ -297,7 +297,7 @@ module outer_hinge(h,right=0,bolt_offset=0)
             }
         }
         translate([0,0,-eps])
-            cylinder(d=h_od,h=h+2*eps);
+            cylinder(d=h_id,h=h+2*eps);
     }
     
     // bolt reinforcement
@@ -724,13 +724,17 @@ translate([100,100,50])
         upper_upper_connector();
 
 */
+
 // front left
+
 translate([0,0,50])
     left_upper_upper_connector();
 
 left_upper_lower_connector();
 
-// front left
+
+// front right
+
 translate([100,0,50])
     rotate([0,0,90])
         right_upper_upper_connector();
@@ -738,6 +742,36 @@ translate([100,0,50])
 translate([100,0,0])
     rotate([0,0,90])
         right_upper_lower_connector();
+
+
+module upper_hinge(right=0)
+{
+    difference()
+    {
+        union()
+        {
+            // basic hinge
+            cylinder(h=hh_it,d=h_iD);
+            
+            // support frame
+            
+            // support ending
+            
+        }
+        
+        // hinge axis hole
+        translate([0,0,-eps])
+            cylinder(h=hh_it+2*eps,d=h_od);
+        
+        // plexiglass hole
+        cube([h_od, h_od, hh_it]);
+    }
+}
+
+/*
+translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
+upper_hinge();
+*/
 
 ///////////////////////
 // BASIC FOOT MODULE //
