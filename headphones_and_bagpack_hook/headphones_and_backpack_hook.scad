@@ -1,5 +1,7 @@
 $fn = 90;
 eps = 0.01;
+tol_z = 0.5;
+tol_xy = 0.1;
 
 // wall parameters
 // wall thickness
@@ -32,6 +34,13 @@ hh_iw = 35+t;
 hh_io = 10;
 hh_ih = 25-hh_io;
 
+// wooden piece parameters
+wp_w = 16.1 + tol_z;
+wp_t = 3.5 + tol_xy;
+wp_d = 15;
+
+
+// sole backpack holder
 module backpack_hook()
 {
     points = [  [0,hh_ih+hh_io,0],
@@ -55,18 +64,19 @@ module backpack_hook()
 
 //backpack_hook();
 
-module helmet_hook()
+// helmet hook for the furniture
+module helmet_hook(co=0,off=2*hh_ih)
 {
     points = [  [0,hh_ih+hh_io,0],
                 [0,hh_io,0],
                 [hh_io,0,0],
                 [hh_iw,0,0],
                 [hh_io+hh_iw,hh_io,0],
-                [hh_io+hh_iw,hh_io+hh_ih+2*hh_ih,0],
-                [hh_io+hh_iw+18+t,hh_io+hh_ih+2*hh_ih],
+                [hh_io+hh_iw,hh_io+hh_ih+off,0],
+                [hh_io+hh_iw+18+t,hh_io+hh_ih+off],
                 [hh_io+hh_iw+18+t,hh_io+hh_ih],];
     
-    for(i=[0:len(points)-2])
+    for(i=[0:len(points)-2-co])
     {
         translate([-hh_io-hh_iw,-hh_ih,0])
         hull()
@@ -77,7 +87,67 @@ module helmet_hook()
     }
 }
 
-//helmet_hook();
+/*
+helmet_hook();
+*/
+module helmet_hook_upper()
+{
+    difference()
+    {
+        helmet_hook();
+        
+        // hole for the wood piece
+        _xo = (t-wp_t)/2;
+        _zo = (h-wp_w)/2;
+        translate([-_xo,-wp_d,_zo])
+            cube([wp_t,2*wp_d,wp_w]);
+        
+        // hole for bolt
+        translate([t/2+eps,0,h/2])
+            rotate([0,-90,0])
+                union()
+                {
+                    cylinder(h=6.5,d=2.2);
+                    cylinder(h=1.5,d=3.8);                    
+                }          
+        
+    }
+}
+
+/*
+translate([75 ,0,0])
+    helmet_hook_upper();
+*/
+
+module helmet_hook_lower()
+{
+    difference()
+    {
+        helmet_hook(co=2,off=65);
+        
+        translate([0,65,0])
+        {
+            // hole for the wood piece
+            _xo = (t-wp_t)/2;
+            _zo = (h-wp_w)/2;
+            translate([-_xo,-wp_d,_zo])
+                cube([wp_t,2*wp_d,wp_w]);
+            
+            // hole for bolt
+            translate([t/2+eps,0,h/2])
+                rotate([0,-90,0])
+                    union()
+                    {
+                        cylinder(h=6.5,d=2.2);
+                        cylinder(h=1.5,d=3.8);                    
+                    }          
+        }
+    }   
+}
+
+/*
+helmet_hook_lower();
+*/
 
 module screw_block()
 {
@@ -89,7 +159,7 @@ module screw_block()
             hull()
             {
                 cylinder(d=t,h=h);
-                translate([0,sb_l,0])
+                translate([0,sb_l-t/2,0])
                     cylinder(d=t,h=h);
             }
             
@@ -167,8 +237,16 @@ module headphones_and_backpack_hook()
 {
     backpack_hook();
     screw_block();
-    translate([0,sb_l,0])
+    translate([0,sb_l-t/2,0])
         headphone_hook();
 }
 
-headphones_and_backpack_hook();
+//headphones_and_backpack_hook();
+
+module backpack_only_hook()
+{
+    backpack_hook();
+    screw_block();
+}
+
+backpack_only_hook();
