@@ -317,13 +317,16 @@ module outer_hinge_simple(h,right=0)
         
         union()
         {
-            rotate([0,0,right*90])
+            // I am sorry, but this make not much sense
+            rotate([0,0,180-right*90])
             {
                 cylinder(d=h_oD,h=h);
-                    
+                
                 cube([h_oD/2,h_oD/2,h]);
                 translate([-h_oD/2,-h_oD/2,0])
                     cube([h_oD/2,h_oD/2,h]);
+                translate([-h_oD/2,-h_oD/4,0])
+                cube([3*h_oD/4,3*h_oD/4,h]);
             }
         }
         translate([0,0,-eps])
@@ -736,7 +739,7 @@ left_upper_lower_connector();
 */
 
 // front right
-/*
+
 translate([100,0,50])
     rotate([0,0,90])
         right_upper_upper_connector();
@@ -744,7 +747,7 @@ translate([100,0,50])
 translate([100,0,0])
     rotate([0,0,90])
         right_upper_lower_connector();
-*/
+
 
 module upper_hinge(right=0)
 {
@@ -851,7 +854,7 @@ module lower_upper_front_left_connector()
         lower_upper_connector();
         
         // hinge hole
-        translate([c_a/2-h_od/2,-c_a/2+h_od/2,ft_h+ft_ho-hh_ob+eps])
+        translate([c_a/2-h_oD/2+eps,-c_a/2+h_oD/2-eps,ft_h+ft_ho-hh_ob+eps])
             outer_hinge_simple(h=hh_ob);
         
     }
@@ -870,7 +873,7 @@ module lower_upper_front_right_connector()
         lower_upper_connector();
         
         // hinge hole
-        translate([-c_a/2+h_od/2,-c_a/2+h_od/2,ft_h+ft_ho-hh_ob+eps])
+        translate([-c_a/2+h_oD/2-eps,-c_a/2+h_oD/2-eps,ft_h+ft_ho-hh_ob+eps])
             outer_hinge_simple(h=hh_ob,right=1);
         
     }
@@ -891,13 +894,13 @@ translate([0,300,0])
 translate([100,300,0])
     lowest_part();
 */
-/*
+
 translate([0,200,0])
     lower_upper_front_left_connector();
 
 translate([100,200,0])
     lower_upper_front_right_connector();
-*/
+
 
 // module for the lowest part screwed to the table bellow
 // '-> TODO carve hole for the PSU cable, bigger then previous
