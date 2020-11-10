@@ -728,15 +728,15 @@ translate([100,100,50])
 */
 
 // front left
-
+/*
 translate([0,0,50])
     left_upper_upper_connector();
 
 left_upper_lower_connector();
-
+*/
 
 // front right
-
+/*
 translate([100,0,50])
     rotate([0,0,90])
         right_upper_upper_connector();
@@ -744,20 +744,27 @@ translate([100,0,50])
 translate([100,0,0])
     rotate([0,0,90])
         right_upper_lower_connector();
-
+*/
 
 module upper_hinge(right=0)
 {
+    //_h = c_h-2*c_wt-z_tol;
+    // additional plexiglass door offset
+    _off = 1.25;
     difference()
     {
         union()
         {
             // basic hinge
-            cylinder(h=hh_it,d=h_iD);
+            cylinder(h=hh_ib,d=h_iD);
             
             // support frame
             translate(right ? [0,h_iD/2-2*pg_wt-pg_t,0] : [0,-h_iD/2,0])
-                cube([h_iD/2+hf_lu,pg_t+2*pg_wt,hh_it]);
+                cube([h_iD/2+hf_lu,pg_t+2*pg_wt,hh_ib]);
+            
+            // resting piece
+            translate(right ? [0,-h_iD/2,0] : [0,0,0])
+                cube([h_iD/2,h_iD/2,hh_ib]);
             
             // support ending
             translate(right ? [hf_lu+h_iD/2-pg_wt,h_iD/2-2*pg_wt-pg_t,0] : [hf_lu+h_iD/2-pg_wt,-h_iD/2,0])
@@ -765,10 +772,10 @@ module upper_hinge(right=0)
             hull()
             {
                 // horizontal part
-                translate([0,0,hh_it-pg_wt])
-                    cube([hh_it,pg_t+2*pg_wt,pg_wt]);
+                translate([0,0,hh_ib-pg_wt])
+                    cube([hh_ib,pg_t+2*pg_wt,pg_wt]);
                 // vertical part
-                cube([pg_wt,pg_t+2*pg_wt,hh_it]);
+                cube([pg_wt,pg_t+2*pg_wt,hh_ib]);
             }
 
             
@@ -776,18 +783,18 @@ module upper_hinge(right=0)
         
         // hinge axis hole
         translate([0,0,-eps])
-            cylinder(h=hh_it+2*eps,d=h_od);
+            cylinder(h=hh_ib+2*eps,d=h_od);
         
         // plexiglass hole
-        translate(right ? [h_iD/2+pg_wt,h_iD/2-pg_wt-pg_t,-pg_wt] : [h_iD/2+pg_wt,-h_iD/2+pg_wt,-pg_wt])
-            cube([hf_lu+hh_it,pg_t,hh_it]);
+        translate(right ? [h_iD/2+pg_wt+_off,h_iD/2-pg_wt-pg_t,-pg_wt] : [h_iD/2+pg_wt+_off,-h_iD/2+pg_wt,-pg_wt])
+            cube([hf_lu+hh_ib,pg_t,hh_ib]);
         
         // tmp cut
         //cube([h_od, h_od, hh_it]);
     }
 }
 
-
+/*
 translate([0,-20,0])
     translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
         upper_hinge();
@@ -796,6 +803,7 @@ translate([0,-20,0])
 translate([0,-40,0])
     translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
         upper_hinge(right=1);
+*/
 
 ///////////////////////
 // BASIC FOOT MODULE //
