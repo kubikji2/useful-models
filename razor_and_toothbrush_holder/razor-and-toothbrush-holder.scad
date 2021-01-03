@@ -41,6 +41,11 @@ tb_z = 100;
 clc_t = 12;
 clc_h = 35;
 
+// interdental brush paramters
+ib_t = 6;
+ib_w = 7;
+ib_o = 4;
+
 // possible extention into separete module
 module base()
 {
@@ -91,6 +96,16 @@ module holder()
                                 r_o+r_x+r_t+tb_X/2+2*wt]);
                 }
                 
+                // interdental hook
+                translate([-tb_X/2-wt,-ib_w/2,tb_z-(2*wt+ib_t+ib_o)-15])
+                hull()
+                {
+                    cube([wt,ib_w,2*wt+ib_t+ib_o]);
+                    translate([-ib_t-ib_o-wt,0,wt+ib_t+ib_o])
+                        cube([2*wt+ib_t+ib_o,ib_w,wt]);
+                }
+                
+                
             }
             
             // razor blades stock holder
@@ -130,6 +145,11 @@ module holder()
             // vertical hole
             translate([0,0,-b_t-wt])
                 cylinder(d=wt,h=b_r+2*eps);
+            
+            // interdental brush hooks
+            translate([-tb_X/2-wt-ib_o-ib_t/2,ib_w/2+eps,tb_z-15])
+                rotate([90,0,0])
+                    cylinder(d=ib_t,h=ib_w+2*eps);
         }
         
         // razor blade storage hole
