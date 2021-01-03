@@ -37,6 +37,10 @@ tb_Y = 15;
 tb_y = 9;
 tb_z = 100;
 
+// contact lens case paremeters
+clc_t = 12;
+clc_h = 35;
+
 // possible extention into separete module
 module base()
 {
@@ -116,13 +120,31 @@ module holder()
                 translate([r_o,-wt-eps,r_z-b_r-r_do+r_d])
                     rotate([-90,0,0])
                         cylinder(h=r_y+2*wt+2*eps,d=r_x);
+            
             }
+            
+            // water hole
+            translate([-tb_X/2-wt-eps,0,b_r+wt/2+eps])
+                rotate([0,90,0])
+                    cylinder(h=tb_X+2*wt+2*eps,d=wt);
+            // vertical hole
+            translate([0,0,-b_t-wt])
+                cylinder(d=wt,h=b_r+2*eps);
         }
         
         // razor blade storage hole
         translate([-rb_x/2,-rb_y,b_t+eps])
             cube([rb_x,rb_y,rb_h+eps]);
     }
+    
+    // contact lens case holder
+    translate([0-tb_X-wt,tb_Y+2*wt+clc_t,0])
+    hull()
+    {
+        cube([tb_X,3*wt,eps]);
+        cube([tb_X,wt,clc_h]);
+    }
+    
 }
 
 holder();
