@@ -750,9 +750,8 @@ translate([100,0,0])
         right_upper_lower_connector();
 */
 
-module upper_hinge(right=0)
+module door_hinge(_h,right=0)
 {
-    //_h = c_h-2*c_wt-z_tol;
     // additional plexiglass door offset
     _off = 1.25;
     difference()
@@ -760,15 +759,15 @@ module upper_hinge(right=0)
         union()
         {
             // basic hinge
-            cylinder(h=hh_it,d=h_iD);
+            cylinder(h=_h,d=h_iD);
             
             // support frame
             translate(right ? [0,h_iD/2-2*pg_wt-pg_t,0] : [0,-h_iD/2,0])
-                cube([h_iD/2+hf_lu,pg_t+2*pg_wt,hh_it]);
+                cube([h_iD/2+hf_lu,pg_t+2*pg_wt,_h]);
             
             // resting piece
             translate(right ? [0,-h_iD/2,0] : [0,0,0])
-                cube([h_iD/2,h_iD/2,hh_it]);
+                cube([h_iD/2,h_iD/2,_h]);
             
             // support ending
             translate(right ? [hf_lu+h_iD/2-pg_wt,h_iD/2-2*pg_wt-pg_t,0] : [hf_lu+h_iD/2-pg_wt,-h_iD/2,0])
@@ -776,10 +775,10 @@ module upper_hinge(right=0)
             hull()
             {
                 // horizontal part
-                translate([0,0,hh_it-pg_wt])
-                    cube([hh_it,pg_t+2*pg_wt,pg_wt]);
+                translate([0,0,_h-pg_wt])
+                    cube([_h,pg_t+2*pg_wt,pg_wt]);
                 // vertical part
-                cube([pg_wt,pg_t+2*pg_wt,hh_it]);
+                cube([pg_wt,pg_t+2*pg_wt,_h]);
             }
 
             
@@ -787,15 +786,22 @@ module upper_hinge(right=0)
         
         // hinge axis hole
         translate([0,0,-eps])
-            cylinder(h=hh_it+2*eps,d=h_od);
+            cylinder(h=_h+2*eps,d=h_od);
         
         // plexiglass hole
         translate(right ? [h_iD/2+pg_wt+_off,h_iD/2-pg_wt-pg_t,-pg_wt] : [h_iD/2+pg_wt+_off,-h_iD/2+pg_wt,-pg_wt])
-            cube([hf_lu+hh_it,pg_t,hh_it]);
-        
-        // tmp cut
-        //cube([h_od, h_od, hh_it]);
+            cube([hf_lu+_h,pg_t,_h]);
     }
+}
+
+module upper_hinge(right=0)
+{
+    door_hinge(_h=hh_it,right=right);
+}
+
+module lower_hinge(right=0)
+{
+    door_hinge(_h=hh_ib, right=right);
 }
 
 /*
@@ -808,6 +814,14 @@ translate([0,-40,0])
     translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
         upper_hinge(right=1);
 */
+translate([100,-20,0])
+    translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
+        lower_hinge();
+
+
+translate([100,-40,0])
+    translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
+        lower_hinge(right=1);
 
 ///////////////////////
 // BASIC FOOT MODULE //
@@ -981,21 +995,23 @@ module lower_upper_front_right_connector()
 }
 
 // middle connectors
-
+/*
 translate([0,300,0])
     lower_upper_back_connector();
+*/
 
 /*
 translate([100,300,0])
     lowest_part();
 */
 
+/*
 translate([0,200,0])
     lower_upper_front_left_connector();
 
 translate([100,200,0])
     lower_upper_front_right_connector();
-
+*/
 
 // module for the lowest part screwed to the table bellow
 module lowest_part()
