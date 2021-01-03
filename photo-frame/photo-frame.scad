@@ -18,8 +18,6 @@ gt = 3;
 // sololit thiskness
 st = 3;
 
-
-
 // M2 parameters
 m2_l = 10;
 m2_d = 2;
@@ -191,9 +189,9 @@ module side_bottom()
 }
     
 
-side();
+//side();
 
-side_bottom();
+//side_bottom();
 
 /*
 corner();
