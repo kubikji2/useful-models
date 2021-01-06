@@ -23,9 +23,10 @@ rb_h = 25;
 // razor dimension
 r_x = 9;
 //r_y = 9;
-r_y = 11;
+//r_y = 11;
+r_y = 10;
 r_o = 5;
-r_z = 100;
+r_z = 110;
 r_d = 5;
 r_do = 3;
 r_t = 5+r_do;
@@ -35,7 +36,7 @@ tb_X = 12;
 tb_x = 7;
 tb_Y = 15;
 tb_y = 9;
-tb_z = 100;
+tb_z = 110;
 
 // contact lens case paremeters
 clc_t = 12;
@@ -139,9 +140,26 @@ module holder()
             }
             
             // water hole
-            translate([-tb_X/2-wt-eps,0,b_r+wt/2+eps])
-                rotate([0,90,0])
-                    cylinder(h=tb_X+2*wt+2*eps,d=wt);
+            _wh_d = (tb_X-wt)/sqrt(2); 
+            translate([-tb_X/2-wt-eps,0,b_r])
+            {
+                _a = _wh_d;
+                // lower side cut
+                rotate([45,0,0])
+                    cube([tb_X+2*wt+2*eps,_a,_a]);
+                _l = tb_z-(r_o+r_x+r_t+tb_X/2+2*wt)-b_r-(tb_X-wt)/2-2;
+                // upper side cut
+                translate([0,0,_l])
+                    rotate([45,0,0])
+                        cube([tb_X+2*wt+2*eps,_a,_a]);
+                // middle section
+                translate([0,-(tb_X-wt)/2,(tb_X-wt)/2])
+                    cube([tb_X+2*wt+2*eps,tb_X-wt,_l]);
+                
+                //rotate([0,90,0])
+                //    rotate([0,0,0])
+                //        cylinder(h=tb_X+2*wt+2*eps,d=_wh_d);
+            }
             // vertical hole
             translate([0,0,-b_t-wt])
                 cylinder(d=wt,h=b_r+2*eps);
