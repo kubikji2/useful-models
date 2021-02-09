@@ -6,7 +6,7 @@ $fn = 90;
 f_t = 10;
 
 // holder parameter
-h_y = 75;
+h_y = 45;
 h_z = 150;
 h_h = 20;
 h_d = 8;
@@ -44,6 +44,12 @@ module holder(right = 0)
                     [0,0,0],
                     [f_t+h_d,0,0],
                     [f_t+h_d,f_t,0]];
+    // back frame
+    points_b1 = [   [0,0,0],
+                    [-h_y,0,0]];    
+    
+    points_b2 = [   [-h_y,0,0],
+                    [0,2*h_y,0]];
     
     difference()
     {
@@ -71,6 +77,10 @@ module holder(right = 0)
     translate([h_y,0,0])
         rotate([0,0,a])
             points_connector(points=points_a, d=h_d, h=h_h);
+    
+    // back additional support
+    points_connector(points=points_b1,d=h_d,h=h_h);
+    points_connector(points=points_b2,d=h_d,h=h_h);        
 }
 
 
