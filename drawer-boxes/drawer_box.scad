@@ -27,4 +27,11 @@ module box (x=82,y=154,z=52,d=20,t=2)
     }
 }
 
-box();
+//box();
+
+module double_box()
+{
+    box(x=2*82,y=154,z=52,d=20,t=2);
+}
+
+double_box();
