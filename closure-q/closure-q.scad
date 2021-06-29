@@ -713,18 +713,20 @@ module right_upper_lower_connector()
 translate([0,100,0])
     rotate([0,0,-90])
         upper_lower_connector();
-
+*/
+/*
 translate([0,100,50])
     rotate([0,0,-90])
         upper_upper_connector();
 */
-/*
-// back right
 
+// back right
+/*
 translate([100,100,0])
     rotate([0,0,180])
         upper_lower_connector();
-
+*/
+/*
 translate([100,100,50])
     rotate([0,0,180])
         upper_upper_connector();
@@ -736,6 +738,8 @@ translate([100,100,50])
 translate([0,0,50])
     left_upper_upper_connector();
 
+*/
+/*
 left_upper_lower_connector();
 */
 
@@ -744,7 +748,8 @@ left_upper_lower_connector();
 translate([100,0,50])
     rotate([0,0,90])
         right_upper_upper_connector();
-
+*/
+/*
 translate([100,0,0])
     rotate([0,0,90])
         right_upper_lower_connector();
@@ -808,12 +813,12 @@ module lower_hinge(right=0)
 translate([0,-20,0])
     translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
         upper_hinge();
-
-
 translate([0,-40,0])
     translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
         upper_hinge(right=1);
 */
+
+/*
 translate([100,-20,0])
     translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
         lower_hinge();
@@ -822,7 +827,7 @@ translate([100,-20,0])
 translate([100,-40,0])
     translate([c_a/2-h_oD/2,-c_a/2+h_oD/2,c_h+5+1])
         lower_hinge(right=1);
-
+*/
 ///////////////////////
 // BASIC FOOT MODULE //
 ///////////////////////
@@ -1008,7 +1013,8 @@ translate([100,300,0])
 /*
 translate([0,200,0])
     lower_upper_front_left_connector();
-
+*/
+/*
 translate([100,200,0])
     lower_upper_front_right_connector();
 */
