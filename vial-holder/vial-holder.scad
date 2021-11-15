@@ -79,11 +79,17 @@ module vial_holder()
         // horizontal label
         for(o=[0:n_x-1])
         {
-            _o = o+1;
+            _t = o+1;
             translate([b_xy+h_D/2+o*(h_D+o_xy),b_xy/2,b_z-0.5+eps])
             {
                 linear_extrude(height=0.5)
-                    text(text=str(_o), size=5, font="Monospac821 BT:style=Bold",
+                    text(text=str(_t), size=5, font="Monospac821 BT:style=Bold",
+                            halign="center",valign="center");
+            }
+            translate([b_xy+h_D/2+o*(h_D+o_xy),b_y-b_xy/2,b_z-0.5+eps])
+            {
+                linear_extrude(height=0.5)
+                    text(text=str(_t), size=5, font="Monospac821 BT:style=Bold",
                             halign="center",valign="center");
             }
         }
@@ -92,11 +98,17 @@ module vial_holder()
         y_l = ["A", "B", "C", "D", "E"];
         for(o=[0:n_y-1])
         {
-            _o = y_l[o];
+            _t = y_l[n_y-1-o];
             translate([b_xy/2,b_xy+h_D/2+o*(h_D+o_xy),b_z-0.5+eps])
             {
                 linear_extrude(height=0.5)
-                    text(text=str(_o), size=5, font="Monospac821 BT:style=Bold",
+                    text(text=str(_t), size=5, font="Monospac821 BT:style=Bold",
+                            halign="center",valign="center");
+            }
+            translate([b_x-b_xy/2,b_xy+h_D/2+o*(h_D+o_xy),b_z-0.5+eps])
+            {
+                linear_extrude(height=0.5)
+                    text(text=str(_t), size=5, font="Monospac821 BT:style=Bold",
                             halign="center",valign="center");
             }
         }
