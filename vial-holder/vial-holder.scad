@@ -66,7 +66,7 @@ module vial_holder()
         //i_po = [[-ci_t,-ci_t,0],[-ci_t,ci_t,0],[ci_t,ci_t,0],[ci_t,-ci_t,0]];
         i_po = [[-ci_t,-ci_t,0],[-ci_t,-ci_t,0],[-ci_t,-ci_t,0],[-ci_t,-ci_t,0]];
 
-        #translate([0,0,-eps])
+        translate([0,0,-eps])
         for(i=[0:len(i_po)-1])
         {
             _i_p = i_p[i];
@@ -111,6 +111,17 @@ module vial_holder()
                     text(text=str(_t), size=5, font="Monospac821 BT:style=Bold",
                             halign="center",valign="center");
             }
+        }
+
+        // nametag
+        name = "Kourimsky";
+        _depth = 0.5;
+        translate([b_x/2,-eps+_depth,b_z/2])
+        rotate([90,0,0])
+        linear_extrude(height=_depth)
+        {
+            text(text=str(name), size=12, font="Monospac821 BT:style=Bold",
+                            halign="center",valign="center");
         }
 
     }
