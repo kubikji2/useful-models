@@ -26,7 +26,7 @@ a = 50;
 // base thicknes
 t = 5;
 // total leg heigh
-h = 75-2*b_t;
+h = 40;
 
 
 module screw_hole()
