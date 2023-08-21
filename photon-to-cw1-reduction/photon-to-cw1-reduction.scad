@@ -30,7 +30,7 @@ wt = 3;
 // '-> wall thickness
 rail_h = 55 + pht_hole_ao;
 // '-> contact rail height
-interaface_l = 40 + pht_hole_max_d;
+interaface_l = 35 + pht_hole_max_d;
 // '-> interface length
 
 $fn = $preview ? 60 : 120;
@@ -90,8 +90,8 @@ module interface()
         }
         
         // bolt hole
-        transform_to_spp(size=[_xl,interaface_l,_zl], align="zY", pos="yZ")
-            translate([0,pht_bolt_off,0.001])
+        transform_to_spp(size=[_xl,interaface_l-pht_hole_max_d,_zl], align="zY", pos="yZ")
+            translate([0,-pht_bolt_off,0.001])
                 cylinderpp(d=pht_bolt_d+2*clrn, h=pht_bolt_d, align="Z");
     }
 
