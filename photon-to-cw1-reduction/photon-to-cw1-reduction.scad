@@ -1,11 +1,13 @@
 include <../solidpp/solidpp.scad>
 
 // clearance
-clrn = 0.2;
+clrn = 0.1;
 
 // Photon parameters 'pht'
 pht_bolt_d = 6;
 // '-> bolt diameter
+pht_bolt_h = 2;
+// '-> bolt height
 pht_bolt_off = 9;
 // '-> bolt offset from the end
 pht_hole_ai = 23;
@@ -22,6 +24,8 @@ cw_a = 28.2;
 // '-> rail side
 cw_bolt_d = 6;
 // '-> bolt diameter
+cw_stump_d = 10;
+// '-> tightening knob stump diameter
 cw_rail_t = 10;
 // '-> rail thickness
 
@@ -92,11 +96,13 @@ module interface()
         // bolt hole
         transform_to_spp(size=[_xl,interaface_l-pht_hole_max_d,_zl], align="zY", pos="yZ")
             translate([0,-pht_bolt_off,0.001])
-                cylinderpp(d=pht_bolt_d+2*clrn, h=pht_bolt_d, align="Z");
+                cylinderpp(d=pht_bolt_d+2*clrn, h=pht_bolt_h, align="Z");
     }
 
     // reinforcement
-    _r = min(interaface_l-2*pht_bolt_off, (rail_h - pht_bolt_off-cw_bolt_d)/2 - pht_bolt_off);
+    _r = min(interaface_l-2*pht_bolt_off, (rail_h - pht_bolt_off-cw_stump_d)/2 - pht_bolt_off);
+    // '-> reinforcement radius
+
     translate([0,0,pht_hole_ao-2*clrn])
         difference()
         {   
