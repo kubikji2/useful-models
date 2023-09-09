@@ -40,7 +40,7 @@ module corner()
 }
 
 // t junction module
-module t_juncion()
+module t_juncion(left_interface=false, right_interface=false)
 {
     _t = s_h;
     translate([0,_t/2,0])
@@ -55,17 +55,32 @@ module t_juncion()
             __base_interface();
 
     // join pieces
-    translate([0, s_h/2, s_h/2])
+    difference()
     {
         _a = s_h + s_wt;
         _size = [s_w+2*s_wt, _a, s_h];
-        cubepp(_size, align="YZ");
+        translate([0, s_h/2, s_h/2])
+            cubepp(_size, align="YZ");
+
+        if(right_interface)
+        {
+            transform_to_spp(_size, align="", pos="X")
+                cubepp([i_l,s_h,s_h], align="X");
+        }
+
+        if(left_interface)
+        {
+            transform_to_spp(_size, align="", pos="x")
+                cubepp([i_l,s_h,s_h], align="x");
+        }
     }
 }
 
+//t_juncion();
+
 
 // x junciton
-module x_juncion()
+module x_juncion(left_interface=false, right_interface=false)
 {
     _t = s_h;
 
@@ -79,6 +94,23 @@ module x_juncion()
     // join pieces
     _a = s_h + s_wt;
     _size = [s_w+2*s_wt, s_h, s_h];
-    cubepp(_size, align="");
+    difference()
+    {
+        cubepp(_size, align="");
+        
+        if(right_interface)
+        {
+            transform_to_spp(_size, align="", pos="X")
+                cubepp([i_l,s_h,s_h], align="X");
+        }
 
+        if(left_interface)
+        {
+            transform_to_spp(_size, align="", pos="x")
+                cubepp([i_l,s_h,s_h], align="x");
+        }
+    }
 }
+
+//x_juncion();
+

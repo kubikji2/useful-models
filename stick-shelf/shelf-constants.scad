@@ -8,5 +8,8 @@ s_w = 16;
 // '-> stick witdth
 s_wt = 2;
 // '-> stick wall thickness
-s_o = 10;
+s_o = 9;
 // '-> stick overlaps
+
+i_l = 6;
+// '-> interface length
