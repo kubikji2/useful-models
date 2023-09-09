@@ -15,7 +15,7 @@ module __base_interface()
 }
 
 
-// corer piece
+// corner piece
 module corner()
 {
     _t = s_h;
@@ -26,7 +26,7 @@ module corner()
         translate([0,_t/2,0])
             __base_interface();
     
-    // join piece
+    // join pieces
     translate([0, s_h/2, s_h/2])
     {
         _a = s_h+s_wt;
@@ -54,7 +54,7 @@ module t_juncion()
         translate([0,_t/2,0])
             __base_interface();
 
-    // join piece
+    // join pieces
     translate([0, s_h/2, s_h/2])
     {
         _a = s_h + s_wt;
@@ -63,3 +63,22 @@ module t_juncion()
     }
 }
 
+
+// x junciton
+module x_juncion()
+{
+    _t = s_h;
+
+    for(i=[0:3])
+    {
+        rotate([i*90,0,0])
+            translate([0,_t/2,0])
+                __base_interface();
+    }
+
+    // join pieces
+    _a = s_h + s_wt;
+    _size = [s_w+2*s_wt, s_h, s_h];
+    cubepp(_size, align="");
+
+}
