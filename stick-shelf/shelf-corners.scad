@@ -117,10 +117,10 @@ module x_juncion(left_interface=false, right_interface=false)
 module interface(clearance)
 {
     points = [  [i_w/2+clearance, 0],
-                [i_w/2+clearance, clearance],
+                //[i_w/2+clearance, clearance],
                 [i_W/2+clearance, i_t+clearance],
                 [-i_W/2-clearance,i_t+clearance],
-                [-i_w/2-clearance, clearance],
+                //[-i_w/2-clearance, clearance],
                 [-i_w/2-clearance, 0]];
     rotate([0, 90, 0])
     linear_extrude(height=s_w+2*s_wt)
@@ -129,15 +129,11 @@ module interface(clearance)
 
 //interface(clearance=pixel_clearance);
 
-
 module pixel(has_male_interface=false, has_female_interface=false)
 {
 
-    _a = s_w + 2*s_wt;
-    _h = s_h + 2*s_wt;
-
-    _size_o = [_a,_a,_h];
-    _size_i = [_a+2*pixel_clearance, s_w+2*pixel_clearance, s_h+2*pixel_clearance];
+    _size_o = [p_a,p_a,p_h];
+    _size_i = [p_a+2*pixel_clearance, s_w+2*pixel_clearance, s_h+2*pixel_clearance];
     difference()
     {
         // outer shell
@@ -145,21 +141,38 @@ module pixel(has_male_interface=false, has_female_interface=false)
         
         // inner cut
         cubepp(_size_i,align="");
-        
-        // top interface
-        translate([-_a/2, -i_clearance-_a/2, s_h/2])
-            interface(clearance=i_clearance);
-        
-        // bottom interface
-        translate([-_a/2, -i_clearance-_a/2, -s_h/2])
-            interface(clearance=i_clearance);
+                
+        // single interface
+        if(has_female_interface)
+        {
+            translate([-p_a/2, -p_a/2, 0])
+                interface(clearance=i_clearance);
+        }
     }
-    // top interface
-    translate([-_a/2, _a/2, s_h/2])
-        interface(clearance=0);
-    // bottom interface
-    translate([-_a/2, _a/2, -s_h/2])
-        interface(clearance=0);
+    
+    if(has_male_interface)
+    {
+        translate([-p_a/2, p_a/2, 0])
+            interface(clearance=0);
+    }
 }
 
 pixel();
+
+module multipixel(n=2, clearance=0.2)
+{
+
+    for(i=[0:n-1])
+    {
+        _off = i*(p_a+clearance);
+        translate([0,_off,0])
+            pixel(false, false);
+        if(i < n-1)
+        {
+            translate([0,p_a/2+_off,0])
+                cubepp([p_a,clearance,p_h], align="y");
+        }
+    }
+}
+
+//multipixel();

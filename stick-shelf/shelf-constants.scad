@@ -13,11 +13,16 @@ s_o = 9;
 
 pixel_clearance = 0.2;
 
+p_a = s_w + 2*s_wt;
+// '-> pixel side
+p_h = s_h + 2*s_wt;
+// '-> pixel height
+
 i_l = 6;
 // '-> interface length
-i_w = 1;
+i_w = 2;
 // '-> interface inner width
-i_W = 1.5;
+i_W = 3;
 // '-> interface outer width
 i_t = 1.2;
 // '-> interface thickness
