@@ -114,3 +114,52 @@ module x_juncion(left_interface=false, right_interface=false)
 
 //x_juncion();
 
+module interface(clearance)
+{
+    points = [  [i_w/2+clearance, 0],
+                [i_w/2+clearance, clearance],
+                [i_W/2+clearance, i_t+clearance],
+                [-i_W/2-clearance,i_t+clearance],
+                [-i_w/2-clearance, clearance],
+                [-i_w/2-clearance, 0]];
+    rotate([0, 90, 0])
+    linear_extrude(height=s_w+2*s_wt)
+        polygon(points=points);
+}
+
+//interface(clearance=pixel_clearance);
+
+
+module pixel(has_male_interface=false, has_female_interface=false)
+{
+
+    _a = s_w + 2*s_wt;
+    _h = s_h + 2*s_wt;
+
+    _size_o = [_a,_a,_h];
+    _size_i = [_a+2*pixel_clearance, s_w+2*pixel_clearance, s_h+2*pixel_clearance];
+    difference()
+    {
+        // outer shell
+        cubepp(_size_o,align="");
+        
+        // inner cut
+        cubepp(_size_i,align="");
+        
+        // top interface
+        translate([-_a/2, -i_clearance-_a/2, s_h/2])
+            interface(clearance=i_clearance);
+        
+        // bottom interface
+        translate([-_a/2, -i_clearance-_a/2, -s_h/2])
+            interface(clearance=i_clearance);
+    }
+    // top interface
+    translate([-_a/2, _a/2, s_h/2])
+        interface(clearance=0);
+    // bottom interface
+    translate([-_a/2, _a/2, -s_h/2])
+        interface(clearance=0);
+}
+
+pixel();
