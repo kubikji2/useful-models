@@ -39,6 +39,8 @@ module corner()
     
 }
 
+corner();
+
 // t junction module
 module t_juncion(left_interface=false, right_interface=false)
 {
@@ -157,7 +159,7 @@ module pixel(has_male_interface=false, has_female_interface=false)
     }
 }
 
-pixel();
+//pixel();
 
 module multipixel(n=2, clearance=0.2)
 {
@@ -176,3 +178,12 @@ module multipixel(n=2, clearance=0.2)
 }
 
 //multipixel();
+
+module joint()
+{
+    pixel();
+    translate([0,p_a/2,0])
+        __base_interface();
+}
+
+//joint();
