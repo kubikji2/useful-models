@@ -12,7 +12,7 @@ fan_corner_r = 10;
 // '-> fan corner radius
 fan_bolt_d = 4.5;
 // '-> fan bolt diameter 
-fan_bolt_off = 5.5 + fan_bolt_d/2;
+fan_bolt_off = (fan_a - 101)/2 - fan_bolt_d/2;
 // '-> fan bolt center offset
 
 clearance = 0.2;
