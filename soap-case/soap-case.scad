@@ -37,6 +37,8 @@ magnet_d = 5;
 magnet_h = 1.7;
 // '-> magnet height
 
+$fn = $preview ? 30 : 60;
+
 
 module tooth()
 {
@@ -56,8 +58,23 @@ module magnets()
 
 module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
-
+    _x = soap_l + 4*case_wt;
+    _y = soap_w + 4*case_wt;
+    _z = soap_h + case_bt - case_free_clearance;
+    _size_o = [_x, _y, _z];
+    _mod_list_o = [round_edges(r=case_cr)];
+    _size_i = _size_o - 2*[case_bt+case_free_clearance, case_bt+case_free_clearance,0];
+    _mod_list_i = [round_edges(r=case_cr-case_wt-case_free_clearance)];
+    translate([0,0,case_bt+case_free_clearance])
+        difference()
+        {
+            cubepp(_size_o, mod_list=_mod_list_o, align="z");
+            translate([0,0,-case_bt+case_free_clearance])
+                cubepp(_size_i, mod_list=_mod_list_i, align="z");       
+        }
 }
+
+cover();
 
 module bottom(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
