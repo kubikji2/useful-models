@@ -43,6 +43,17 @@ module tooth()
 
 }
 
+
+module magnets()
+{
+    _t = [0,0,0];
+
+    mirrorpp([1,0,0], true)
+        mirrorpp([0,1,0], true)
+            translate(_t)
+                cylinderpp(h=magnet_h+case_thigh_clearance, d=magnet_d+2*case_thigh_clearance);
+}
+
 module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
 
@@ -50,5 +61,5 @@ module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 
 module bottom(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
-
+    
 }
