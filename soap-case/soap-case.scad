@@ -1,5 +1,8 @@
 include<../solidpp/solidpp.scad>
 
+// soap size customizer
+soap_size = "big"; // ["small", "big"]
+
 // soap dimensions, including sufficient margins
 small_soap_w = 35;
 // '-> soap width
@@ -46,6 +49,11 @@ $fn = $preview ? 30 : 60;
 // eps
 eps = 0.01;
 
+// argument processing
+soap_l = soap_size == "big" ? big_soap_l : small_soap_l;
+soap_w = soap_size == "big" ? big_soap_w : small_soap_w;
+soap_h = soap_size == "big" ? big_soap_h : small_soap_h;
+
 
 // modules
 
@@ -64,7 +72,7 @@ module tooth(teeth_w, teeth_l)
 
 
 // teeth for the water to run away
-module teeth(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
+module teeth(soap_w=soap_w, soap_h=soap_h, soap_l=soap_l)
 {
     // computing number of teeth
     _n = floor(soap_l/(2*case_teeth_w));
@@ -83,19 +91,19 @@ module teeth(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 
 
 // holes for the magnets
-module magnet_holes(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
+module magnet_holes(soap_w=soap_w, soap_h=soap_h, soap_l=soap_l)
 {
     _t = [soap_l/2 + case_wt, soap_w/2 - magnet_d/2 - magnet_off - case_wt, magnet_off];
 
     mirrorpp([1,0,0], true)
         mirrorpp([0,1,0], true)
             translate(_t)
-                cylinderpp(h=2*(magnet_h+case_thigh_clearance+case_free_clearance), d=magnet_d+2*case_thigh_clearance, zet="x");
+                cylinderpp(h=2*(magnet_h+2*case_thigh_clearance+case_free_clearance), d=magnet_d+2*case_thigh_clearance, zet="x");
 }
 
 
 // case cover
-module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
+module cover(soap_w=soap_w, soap_h=soap_h, soap_l=soap_l)
 {
     _x = soap_l + 4*case_wt;
     _y = soap_w + 4*case_wt;
@@ -129,7 +137,7 @@ cover();
 
 
 // case bottom
-module bottom(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
+module bottom(soap_w=soap_w, soap_h=soap_h, soap_l=soap_l)
 {
     _x = soap_l + 4*case_wt;
     _y = soap_w + 4*case_wt;
