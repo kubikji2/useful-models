@@ -41,10 +41,15 @@ magnet_h = 0.8;
 magnet_off = 1;
 // '-> magnet offset
 
+// fn
 $fn = $preview ? 30 : 60;
+// eps
 eps = 0.01;
 
 
+// modules
+
+// single tooth
 module tooth(teeth_w, teeth_l)
 {
     points = [  [0,0],
@@ -58,12 +63,15 @@ module tooth(teeth_w, teeth_l)
 }
 
 
+// teeth for the water to run away
 module teeth(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
+    // computing number of teeth
     _n = floor(soap_l/(2*case_teeth_w));
+    // computing the hole increment
     _comp = (soap_l - _n*(2*case_teeth_w))/_n;
-    echo(_n);
-    echo (_comp);
+
+    // multiplying tooth
     translate([-soap_l/2,0,0])
     for(i=[0:_n-1])
     {
@@ -72,6 +80,7 @@ module teeth(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
             tooth(teeth_w=case_teeth_w, teeth_l=soap_w);
     }
 }
+
 
 // holes for the magnets
 module magnet_holes(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
@@ -109,10 +118,14 @@ module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
             // magnet holes
             translate([0,0, magnet_off-case_free_clearance])
                 magnet_holes(soap_w, soap_h, soap_l);
+            
+            // hole for the fingers
+            translate([0,0,case_teeth_h])
+                cylinderpp(d=_x/2, h=_y+2*eps, zet="y", align="Z");
         }
 }
 
-//cover();
+cover();
 
 
 // case bottom
