@@ -26,8 +26,10 @@ case_free_clearance = 0.2;
 // '-> clearance for 3D printed parts freely moving
 case_thigh_clearance = 0.1;
 // '-> clearamce for 3D printed parts tightly fitted
-case_teeth_h = 2;
+case_teeth_h = 4;
 // '-> teeth height
+case_teeth_w = 3;
+// '-> teeth_with
 case_cr = 5;
 // '-> corner diameter
 
@@ -43,23 +45,47 @@ $fn = $preview ? 30 : 60;
 eps = 0.01;
 
 
-module tooth()
+module tooth(teeth_w, teeth_l)
 {
-
+    points = [  [0,0],
+                [teeth_w, 0],
+                [teeth_w, teeth_w],
+                [0, teeth_w + case_teeth_h]];
+    translate([0, teeth_l/2, 0])
+        rotate([90, 0, 0])
+            linear_extrude(teeth_l)
+                polygon(points);
 }
 
 
+module teeth(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
+{
+    _n = floor(soap_l/(2*case_teeth_w));
+    _comp = (soap_l - _n*(2*case_teeth_w))/_n;
+    echo(_n);
+    echo (_comp);
+    translate([-soap_l/2,0,0])
+    for(i=[0:_n-1])
+    {
+        _t = [i*(2*case_teeth_w+_comp),0,0];
+        translate(_t)
+            tooth(teeth_w=case_teeth_w, teeth_l=soap_w);
+    }
+}
+
+// holes for the magnets
 module magnet_holes(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
     _t = [soap_l/2 + case_wt, soap_w/2 - magnet_d/2 - magnet_off - case_wt, magnet_off];
 
-    #mirrorpp([1,0,0], true)
+    mirrorpp([1,0,0], true)
         mirrorpp([0,1,0], true)
             translate(_t)
                 cylinderpp(h=2*(magnet_h+case_thigh_clearance+case_free_clearance), d=magnet_d+2*case_thigh_clearance, zet="x");
 }
 
 
+// case cover
 module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
     _x = soap_l + 4*case_wt;
@@ -75,17 +101,21 @@ module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
             
             // outer shell
             cubepp(_size_o, mod_list=_mod_list_o, align="z");
+            
             // inner hole
             translate([0,0,-case_bt+case_free_clearance])
-                cubepp(_size_i, mod_list=_mod_list_i, align="z");     
+                cubepp(_size_i, mod_list=_mod_list_i, align="z");
+
             // magnet holes
             translate([0,0, magnet_off-case_free_clearance])
                 magnet_holes(soap_w, soap_h, soap_l);
         }
 }
 
-%cover();
+//cover();
 
+
+// case bottom
 module bottom(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
     _x = soap_l + 4*case_wt;
@@ -101,7 +131,7 @@ module bottom(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
     _mod_list_b = [round_edges(r=case_cr)];
 
     // soap size
-    _size_soap = [soap_l, soap_w, soap_h];
+    _size_soap = [soap_l, soap_w, soap_h+case_teeth_h+case_bt];
     _mod_list_soap = case_cr-2*case_wt > 0 ? [round_edges(r=case_cr-2*case_wt)] : [];
 
 
@@ -124,6 +154,9 @@ module bottom(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
         translate([0,0,-eps])
             cubepp(_size_soap, mod_list=_mod_list_soap, align="z");
     }
+
+    // adding teeth
+    teeth();
 
 }
 
