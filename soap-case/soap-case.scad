@@ -36,10 +36,11 @@ magnet_d = 4;
 // '-> magnet diameter
 magnet_h = 0.8;
 // '-> magnet height
-magnet_off = 2;
+magnet_off = 1;
 // '-> magnet offset
 
 $fn = $preview ? 30 : 60;
+eps = 0.01;
 
 
 module tooth()
@@ -50,13 +51,14 @@ module tooth()
 
 module magnet_holes(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
-    _t = [soap_l/2 + case_wt, soap_w/2 - magnet_d/2 - magnet_off, magnet_off];
+    _t = [soap_l/2 + case_wt, soap_w/2 - magnet_d/2 - magnet_off - case_wt, magnet_off];
 
     #mirrorpp([1,0,0], true)
         mirrorpp([0,1,0], true)
             translate(_t)
                 cylinderpp(h=2*(magnet_h+case_thigh_clearance+case_free_clearance), d=magnet_d+2*case_thigh_clearance, zet="x");
 }
+
 
 module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
@@ -78,13 +80,51 @@ module cover(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
                 cubepp(_size_i, mod_list=_mod_list_i, align="z");     
             // magnet holes
             translate([0,0, magnet_off-case_free_clearance])
-            magnet_holes(soap_w, soap_h, soap_l);
+                magnet_holes(soap_w, soap_h, soap_l);
         }
 }
 
-cover();
+%cover();
 
 module bottom(soap_w=small_soap_w, soap_h=small_soap_h, soap_l=small_soap_l)
 {
-    
+    _x = soap_l + 4*case_wt;
+    _y = soap_w + 4*case_wt;
+    _z = soap_h/2 + case_teeth_h;
+    // inner part size and mods
+    _size = [_x - 2*case_wt - 2*case_free_clearance, _y - 2*case_wt - 2*case_free_clearance, _z];
+    _mod_list = [round_edges(r=case_cr-case_wt-2*case_free_clearance)];
+
+    // bottom part size and mods
+    _z_b = case_bt-case_free_clearance;
+    _size_b = [_x, _y, _z_b];
+    _mod_list_b = [round_edges(r=case_cr)];
+
+    // soap size
+    _size_soap = [soap_l, soap_w, soap_h];
+    _mod_list_soap = case_cr-2*case_wt > 0 ? [round_edges(r=case_cr-2*case_wt)] : [];
+
+
+    difference()
+    {
+        union()
+        {
+            // baseplate
+            cubepp(_size_b, mod_list=_mod_list_b, align="z");
+            // inner module
+            translate([0,0,_z_b])
+                cubepp(_size, mod_list=_mod_list, align="z");
+        }
+
+        // magnet holes
+        translate([0,0, case_bt+magnet_off])
+            magnet_holes(soap_w, soap_h, soap_l);
+
+        // inner hole
+        translate([0,0,-eps])
+            cubepp(_size_soap, mod_list=_mod_list_soap, align="z");
+    }
+
 }
+
+bottom();
