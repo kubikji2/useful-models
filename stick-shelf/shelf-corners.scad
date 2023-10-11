@@ -131,11 +131,11 @@ module interface(clearance)
 
 //interface(clearance=pixel_clearance);
 
-module pixel(has_male_interface=false, has_female_interface=false)
+module pixel(has_male_interface=false, has_female_interface=false, clearance=pixel_clearance)
 {
 
     _size_o = [p_a,p_a,p_h];
-    _size_i = [p_a+2*pixel_clearance, s_w+2*pixel_clearance, s_h+2*pixel_clearance];
+    _size_i = [p_a+2*clearance, s_w+2*clearance, s_h+2*clearance];
     difference()
     {
         // outer shell
@@ -159,7 +159,7 @@ module pixel(has_male_interface=false, has_female_interface=false)
     }
 }
 
-//pixel();
+pixel(clearance=0.3);
 
 module multipixel(n=2, clearance=0.2)
 {
@@ -168,7 +168,7 @@ module multipixel(n=2, clearance=0.2)
     {
         _off = i*(p_a+clearance);
         translate([0,_off,0])
-            pixel(false, false);
+            pixel(false, false, clearance=0.2);
         if(i < n-1)
         {
             translate([0,p_a/2+_off,0])

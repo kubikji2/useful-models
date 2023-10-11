@@ -1,3 +1,5 @@
+# ignore exported stls
 *.stl
+# ignore slicing related files
 *.gcode
 *.3mf
