@@ -33,7 +33,7 @@ sh_D = 6.8;
 
 // general dimensions
 _x = ec_x + 2*wt;
-_y = 205 + wt;
+_y = 200 + wt;
 _z = ec_z + 2*wt;
 
 // furniture interface
@@ -74,6 +74,61 @@ module furniture_interface()
 }
 
 
+// hook parameters
+shaft_d = 35;
+// '-> shaft diameter
+h_wt = 3;
+// '-> wall thickness
+h_h = 50;
+// '-> height
+h_g = _y-2*h_h;
+// '-> guage
+h_off = 7 + wt;
+// '-> offset
+h_clearance = 0.5;
+
+// hook to the shaft
+module shaft_hook(is_up = true, is_halved = true)
+{
+    _D = shaft_d + 2*h_wt;
+    _H = h_h;
+    _h = is_halved ? h_h/2 - h_clearance : h_h;
+    _d = shaft_d;
+    _a = is_up ? "Z" : "z";
+
+    difference()
+    {
+        transform_to_spp([_d,_d,_H], align="", pos=_a) 
+        hull()
+        {
+            // outer shell
+            cylinderpp(d=_D, h=_h, align=_a);
+                
+            // connection to the adapter holder
+            translate([h_off,0,0])
+                transform_to_spp([_d,_d,_h], align=_a, pos="X")
+                    cubepp([h_wt, 3*_d/4, _h], align="X");
+
+            children();
+
+        }
+            
+     
+        translate([0,0,(is_up ? 1 : -1)*h_h/2])
+        {
+            // shaft hole
+            //translate([h_off,0,0])
+                cylinderpp(d=_d, h=2*_H, align="");
+
+            // assembly shaft hole
+            _hole_d = 3*_d/4; //shaft_d-2*length;
+            cubepp([_d, _hole_d, 2*_H], align="X");
+        }
+    }
+
+}
+
+
 // sleeve for coord
 module coord_sleeve()
 {
@@ -99,59 +154,8 @@ module coord_sleeve()
 }
 
 
-// hook parameters
-shaft_d = 35;
-// '-> shaft diameter
-h_wt = 2;
-// '-> wall thickness
-h_h = 30;
-// '-> height
-h_g = 150;
-// '-> guage
-h_off = 7 + wt;
-
-// hook to the shaft
-module shaft_hook(is_up = true)
-{
-    _D = shaft_d + 2*h_wt;
-    _h = h_h;
-    _d = shaft_d;
-    _a = is_up ? "Z" : "z";
-
-    difference()
-    {
-        hull()
-        {
-            // outer shell
-            cylinderpp(d=_D, h=_h, align=_a);
-                
-            // connection to the adapter holder
-            translate([h_off,0,0])
-                transform_to_spp([_d,_d,_h], align=_a,pos="X")
-                    cubepp([h_wt, 3*_d/4, _h], align="X");
-
-            children();
-
-        }
-
-            
-     
-        translate([0,0,(is_up ? 1 : -1)*h_h/2])
-        {
-            // shaft hole
-            //translate([h_off,0,0])
-                cylinderpp(d=_d, h=2*_h, align=_a);
-
-            // assembly shaft hole
-            _hole_d = 3*_d/4; //shaft_d-2*length;
-            cubepp([_hole_d, _d , 2*_h], align=str(_a,"Y"));
-        }
-    }
-
-}
-
 // final module
-module coord_holder(double=false, has_hooks=false)
+module coord_holder(is_doubled=false, has_hooks=false, is_dominant=false, has_half_hooks=false)
 {
     // interface for connecting to the furniture
     if (!has_hooks)
@@ -159,19 +163,17 @@ module coord_holder(double=false, has_hooks=false)
         furniture_interface();
     }
     else
-    {
+    {   
+        // define whther use double hooks or not
+        __has_half_hooks = is_doubled || has_half_hooks;
+        
         // bottom hook
-        shaft_hook(false)
-            if(double)
-                rotate([0,0,180])
-                    shaft_hook(false);
+        translate([0,0,h_h/2])
+            shaft_hook(is_dominant, __has_half_hooks);
         
         // top hook
-        translate([0,0,h_g+h_h])
-            shaft_hook(false)
-                if(double)
-                    rotate([0,0,180])
-                        shaft_hook(false);
+        translate([0,0,h_g+h_h + h_h/2])
+            shaft_hook(is_dominant, __has_half_hooks);
 
     }
 
@@ -186,16 +188,27 @@ module coord_holder(double=false, has_hooks=false)
                 coord_sleeve();
     
     // if double, add second sleeve
-    if(double)
+    if(is_doubled)
     {
-        _t1_off = _t1 + (has_hooks ? [_x,0,0] : [_z-wt,0,0]);
-        _r_off = has_hooks ? [90,0,-90] : [0,0,0];
-        _t2_off = has_hooks ? [-shaft_d/2 - h_off + wt, _x, 0] : [0,0,0];
-        translate(_t2_off)
-            rotate(_r_off)
-                translate(_t1_off)
-                    coord_sleeve(); 
+        if (has_hooks)
+        {
+            rotate([0,0,180])
+                coord_holder(is_doubled=false, has_hooks=true, is_dominant = !is_dominant, has_half_hooks = true);
+        }
+        else
+        {
+            _t1_off = _t1 + (has_hooks ? [_x,0,0] : [_z-wt,0,0]);
+            _r_off = has_hooks ? [90,0,-90] : [0,0,0];
+            _t2_off = has_hooks ? [-shaft_d/2 - h_off + wt, _x, 0] : [0,0,0];
+            translate(_t2_off)
+                rotate(_r_off)
+                    translate(_t1_off)
+                        coord_sleeve(); 
+        }
+
     }
 }
 
 coord_holder(true, true);
+
+//shaft_hook(true);
