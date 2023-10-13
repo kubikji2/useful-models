@@ -177,7 +177,7 @@ module multipixel(n=2, clearance=0.2)
     }
 }
 
-//multipixel();
+multipixel();
 
 module joint()
 {
