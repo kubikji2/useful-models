@@ -109,7 +109,7 @@ module shaft_hook(is_up = true, is_halved = true)
                 transform_to_spp([_d,_d,_h], align=_a, pos="X")
                     cubepp([h_wt, 3*_d/4, _h], align="X");
 
-            children();
+            //children();
 
         }
             
@@ -166,7 +166,7 @@ module coord_holder(is_doubled=false, has_hooks=false, is_dominant=false, has_ha
     {   
         // define whther use double hooks or not
         __has_half_hooks = is_doubled || has_half_hooks;
-        
+
         // bottom hook
         translate([0,0,h_h/2])
             shaft_hook(is_dominant, __has_half_hooks);
@@ -197,18 +197,14 @@ module coord_holder(is_doubled=false, has_hooks=false, is_dominant=false, has_ha
         }
         else
         {
-            _t1_off = _t1 + (has_hooks ? [_x,0,0] : [_z-wt,0,0]);
-            _r_off = has_hooks ? [90,0,-90] : [0,0,0];
-            _t2_off = has_hooks ? [-shaft_d/2 - h_off + wt, _x, 0] : [0,0,0];
-            translate(_t2_off)
-                rotate(_r_off)
-                    translate(_t1_off)
-                        coord_sleeve(); 
+            _t_off = _t1 + [_z+2*wt,0,0];
+                translate(_t_off)
+                    coord_sleeve(); 
         }
 
     }
 }
 
-coord_holder(true, true);
+coord_holder(is_doubled=true, has_hooks=true);
 
 //shaft_hook(true);
