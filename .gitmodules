@@ -2,3 +2,8 @@
 	path = solidpp
 	url = https://github.com/kubikji2/solidpp.git
 	branch = master
+
+[submodule "deez-nuts"]
+	path = deez-nuts
+	url = https://github.com/kubikji2/deez-nuts.git
+	branch = master
