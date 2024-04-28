@@ -39,9 +39,12 @@ screw_d = 3;
 screw_l = 20;
 // '-> screw length (not that relevant)
 screw_descriptor = str("M", screw_d, "x", screw_l);
+// '-> screw descriptor
 screw_standard = "LUXPZ";
+// '-> screw standard
 
 screw_mount_offset = 10;
+// '-> screw mount plate offset, the screws are in the middle
 
 // define connecting bolts
 bolt_l = 30;
@@ -69,23 +72,30 @@ filter_t = 7;
 filter_wt = 2;
 // '-> filter wall thickness
 filter_frame_thickess = 3;
+// '-> filter part bottom frame thickness
 
+
+// main part params
 body_a = fan_a + 2*filter_wt + 2*other_wt;
+// '-> body square side length (x and z axis)
 body_t = fan_h + filter_t + 3*other_wt + middle_wt;
+// '-> body thickness (y axis)
 
 
-
-
-module bolt_and_nut()
+// fan bolt and nut hole
+module fan_bolt_and_nut_hole()
 {
     // bolt
     bolt_hole(  descriptor = bolt_descriptor,
                 standard = bolt_standard,
                 clearance = clearance);
+    // visual bolt
+    /*
     color("silver") 
         % bolt( descriptor = bolt_descriptor,
-                standard = bolt_standard);
-
+                standard = bolt_standard,
+                visual=true);
+    */
     // nut
     rotate([180,0,0])
     {
@@ -94,14 +104,19 @@ module bolt_and_nut()
                     clearance = clearance,
                     h_clearance = 10,
                     align="t");
+        /*
+        // visual nut
         color("dimgray") 
         % nut(  d=nut_diameter,
                 standard=nut_standard,
-                align="t");
+                align="t",
+                visual=true);
+        */
     }
 }
 
 
+// mounting interfece to the closure ceiling
 module mounting_interface()
 {
     difference()
@@ -111,7 +126,7 @@ module mounting_interface()
                 mod_list = [round_edges(d=7,axes="xy")],
                 align="z");
 
-        // holes
+        // screw holes
         mirrorpp([1,0,0], true)
             mirrorpp([0,1,0], true)
                 translate([body_a/2-screw_mount_offset/2,body_t/2+screw_mount_offset/2, 1])
@@ -122,9 +137,9 @@ module mounting_interface()
 }
 
 
+// main body module
 module body_selector(is_fan_body=false)
 {
-    translate([0,0,0])
     difference()
     {
         union()
@@ -148,7 +163,7 @@ module body_selector(is_fan_body=false)
             mirrorpp([0,0,1], true)
                 translate([fan_a/2-fan_bolt_off, bolt_l, fan_a/2-fan_bolt_off])
                     rotate([90,0,0])
-                        bolt_and_nut();
+                        fan_bolt_and_nut_hole();
 
         // add hole for the filter
         translate([0,fan_h+other_wt+middle_wt,0])
@@ -164,33 +179,49 @@ module body_selector(is_fan_body=false)
                     mod_list=[round_edges(d=fan_cable_t, axes="yz")]);        
 
         // add splitting cut
-        translate([0,fan_h/2+other_wt,0])
-            cubepp([2*fan_a, clearance, 2*fan_a], align="");
+        //%translate([0,fan_h/2+other_wt,0])
+        //    cubepp([2*fan_a, clearance, 2*fan_a], align="");
+        
+        if(is_fan_body)
+        {
+            translate([0,fan_h/2+other_wt-clearance/2,0])
+                cubepp([2*fan_a, 2*(body_t+2*screw_mount_offset), 2*fan_a], align="y");
+        }
+        else
+        {
+            translate([0,fan_h/2+other_wt+clearance/2,0])
+                cubepp([2*fan_a, 2*(body_t+2*screw_mount_offset), 2*fan_a], align="Y");
+        }
 
-        color("skyblue")
-        %translate([0,fan_h+other_wt+middle_wt,0])
-            filter_holder();
-
+        // filter piece visualization
+        /*
+        %color("skyblue")
+            translate([0,fan_h+other_wt+middle_wt,0])
+                render(10)
+                    filter_holder();
+        */
     }
 
 }
 
-//body_selector();
 
-
+// fan body part
 module fan_body()
 {
-
+    body_selector(is_fan_body=true);
 }
 
+
+// filter body part
 module filter_body()
 {
-
+    body_selector(is_fan_body=false);
 }
 
+
+// filter 
 module filter_holder()
 {
-    render(10)
     difference()
     {
         
@@ -247,9 +278,9 @@ module filter_holder()
     
 }
 
-//filter_holder();
 
-module supports()
+// support enforcers
+module filter_support_enforcers()
 {
     intersection()
     {
@@ -264,9 +295,9 @@ module supports()
     }
 }
 
-supports();
 
-module body()
+/*
+module test_body()
 {
 
     _test_t = 2;
@@ -298,5 +329,5 @@ module body()
     }
 
 }
-
+*/
 //body();
