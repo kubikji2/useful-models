@@ -18,15 +18,25 @@ fan_bolt_d = 4.5;
 fan_bolt_off = (fan_a - 101)/2 - fan_bolt_d/2;
 // '-> fan bolt center offset
 
+// fan cables
 fan_cable_w = 2.6;
+// '-> cables width
 fan_cable_t = 1.3;
+// '-> cables thickness
 
+// fan mesh-like cover
+fan_cover_t = 1;
+// '-> fan cover thickness
+fan_cover_mnt_d = 8.5;
+// '-> fan cover mountpoints diameter
 
 clearance = 0.2;
+// '-> used clearance
 
 $fn = $preview ? 30 : 120;
 
-
+front_wt = 2;
+// '-> front wall thickness
 mount_wt = 3;
 // '-> mount wall thickness
 other_wt = 2;
@@ -78,7 +88,7 @@ filter_frame_thickess = 3;
 // main part params
 body_a = fan_a + 2*filter_wt + 2*other_wt;
 // '-> body square side length (x and z axis)
-body_t = fan_h + filter_t + 3*other_wt + middle_wt;
+body_t = fan_h + filter_t + 2*other_wt + middle_wt + front_wt;
 // '-> body thickness (y axis)
 
 
@@ -97,6 +107,7 @@ module fan_bolt_and_nut_hole()
                 visual=true);
     */
     // nut
+    translate([0,0,clearance])    
     rotate([180,0,0])
     {
         nut_hole(   d = nut_diameter,
@@ -122,14 +133,14 @@ module mounting_interface()
     difference()
     {
         // baseplate
-        cubepp( [body_a, body_t + 2*screw_mount_offset, mount_wt],
+        cubepp( [body_a + 2*screw_mount_offset, body_t, mount_wt],
                 mod_list = [round_edges(d=7,axes="xy")],
                 align="z");
 
         // screw holes
         mirrorpp([1,0,0], true)
             mirrorpp([0,1,0], true)
-                translate([body_a/2-screw_mount_offset/2,body_t/2+screw_mount_offset/2, 1])
+                translate([body_a/2+screw_mount_offset/2,body_t/2-screw_mount_offset/2, 1])
                     rotate([180,0,0])
                         screw_hole(descriptor = screw_descriptor, standard = screw_standard, align="m", hh_off=mount_wt);
 
@@ -155,21 +166,33 @@ module body_selector(is_fan_body=false)
         cylinderpp(d=fan_a-2*fan_t, h=3*body_t, align="", zet="y");
 
         // add fan body hole
-        translate([0, other_wt-clearance, 0])
+        translate([0, front_wt-clearance, 0])
             cubepp([fan_a+2*clearance, fan_h + 2*clearance, fan_a+2*clearance], align="y"); 
 
-        // add fan holes
-        mirrorpp([1,0,0], true)
-            mirrorpp([0,0,1], true)
-                translate([fan_a/2-fan_bolt_off, bolt_l, fan_a/2-fan_bolt_off])
-                    rotate([90,0,0])
-                        fan_bolt_and_nut_hole();
+        // add fan fastener holes
+        translate([0,front_wt-fan_cover_t,0])
+            mirrorpp([1,0,0], true)
+                mirrorpp([0,0,1], true)
+                    translate([fan_a/2-fan_bolt_off, bolt_l, fan_a/2-fan_bolt_off])
+                        rotate([90,0,0])
+                            fan_bolt_and_nut_hole();
+        
+        // add hole for the fan cover
+        translate([0,front_wt/2,0])
+            mirrorpp([1,0,0], true)
+            hull()
+            {
+                _d = fan_cover_mnt_d;
+                mirrorpp([1,0,1], true)
+                    translate([fan_a/2-fan_bolt_off, 0, fan_a/2-fan_bolt_off])
+                        cylinderpp(d=_d, h=2*front_wt, zet="y", align="m");
+            }
 
         // add hole for the filter
-        translate([0,fan_h+other_wt+middle_wt,0])
+        translate([0,fan_h+front_wt+middle_wt,0])
             cubepp([fan_a+filter_wt+2*clearance, fan_h, fan_a+filter_wt+2*clearance], align="y"); 
         
-        translate([0,fan_h+other_wt+middle_wt+other_wt+filter_t/2-clearance,0])
+        translate([0,fan_h+front_wt+middle_wt+other_wt+filter_t/2-clearance,0])
             cubepp([fan_a+2*filter_wt+2*clearance, fan_h, fan_a+2*filter_wt+2*clearance], align="y"); 
 
         // cable hole
