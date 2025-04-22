@@ -4,7 +4,7 @@ include<../solidpp/solidpp.scad>
 // http://tolaemon.com/raupscoiler/#
 S = 0.75;   // "eccentricity"
 D = 0.3; // relative size radius decrement per revolution
-T = 0.7; // relative translation per revolution
+T = 1.3; // relative translation per revolution
 W = 10; // initial size in [mm] 
 
 R = 3; // number of revolutions
@@ -17,10 +17,10 @@ angle_increment = 360 / dr;
 
 for (i=[0:R*dr])
 {
-    
     // scale factor for first and second cylinder
     _sf1 = (1-D*(i/dr));
-    _sf2= (1-D*((i+1)/dr));
+    _sf2 = (1-D*((i+1)/dr));
+    // vertical translation
     _z_off1 = T*(W/2)*D*(i/dr);
     _z_off2 = T*(W/2)*D*((i+1)/dr);
 
@@ -42,7 +42,7 @@ for (i=[0:R*dr])
 
         }
         
-        if(((W*_sf2)/S-2*shell_thickness) > 0)
+        if(((W*_sf2)/S-2*shell_thickness) > 0 &&  ((W*_sf2)-2*shell_thickness) > 0)
         {
             hull()
             {   
