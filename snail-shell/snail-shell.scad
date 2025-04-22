@@ -2,9 +2,9 @@ include<../solidpp/solidpp.scad>
 
 // Raup's Colier
 // http://tolaemon.com/raupscoiler/#
-S = 2;   // "eccentricity"
+S = 0.75;   // "eccentricity"
 D = 0.3; // relative size radius decrement per revolution
-T = 1.2; // relative translation per revolution
+T = 0.7; // relative translation per revolution
 W = 10; // initial size in [mm] 
 
 R = 3; // number of revolutions
