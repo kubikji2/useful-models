@@ -6,11 +6,11 @@ drawer_depth = 62.5;
 
 // spice jars parameters
 spice_jar_d = 42;
-spice_jar_clearance = 0.2;
+spice_jar_clearance = 0.5;
 
 // variable parameters
 wt = 3;
-bt = 5;
+top_thickness = 5;
 spice_jar_spacing = 5;
 
 horizontal_space = drawer_width - 2*spice_jar_d-2*spice_jar_spacing;
@@ -71,14 +71,14 @@ translate([spice_jar_d/2+spice_jar_spacing,0,0])
         {
             cylinderpp(d=spice_jar_d,h=drawer_depth);
 
-            //spice_jar_voroni();
+            spice_jar_voroni();
 
         }
 
     }
 }
 
-module jar_holder_segment(is_first=true, is_last=false)
+module jar_holder_segment(is_first=false, is_last=false)
 {
     // main body
     difference()
@@ -88,25 +88,31 @@ module jar_holder_segment(is_first=true, is_last=false)
                 align="zx");
 
         // cut out middle
-        _mx = !is_first && !is_last ? body_x-2*wt :
-                (is_first && is_last ? body_x-2*wt : body_x);
-        _ma = is_first == is_last ? "xz" : "xz";
-        _mo = is_first == is_last ? wt :
-                (is_first && !is_last ? -wt : wt);
+        //_mx = !is_first && !is_last ? body_x-2*wt :
+        //        (is_first && is_last ? body_x-2*wt : body_x);
+        _mx = 3*body_x;
+        //_ma = is_first == is_last ? "xz" : "xz";
+        _ma = "xz";
+        //_mo = is_first == is_last ? wt :
+        //        (is_first && !is_last ? -wt : wt);
+        _mo = 0;
 
-
-        translate([_mo,0,bt])
-            cubepp([_mx, drawer_width-2*wt, holder_height-2*bt], align=_ma);
+        translate([_mo,0,wt])
+            cubepp([_mx, drawer_width-2*wt, holder_height-wt-top_thickness], align=_ma);
 
         // add hole of spices
-        translate([spice_jar_d/2+spice_jar_spacing,0,bt])
+        translate([spice_jar_d/2+spice_jar_spacing,0,wt])
         {
             mirrorpp([0,1,0], true)
                 translate([0,horizontal_guage/2,0])
-                    cylinderpp(d=spice_jar_d,h=drawer_depth);
+                    cylinderpp( d=spice_jar_d+2*spice_jar_clearance,
+                                h=drawer_depth);
 
             translate([vertical_step,0,0])
-                cylinderpp(d=spice_jar_d,h=drawer_depth);
+                cylinderpp( d=spice_jar_d+2*spice_jar_clearance,
+                            h=drawer_depth);
+            translate([vertical_step,0,0])
+                %spice_jar_voroni();
         }
         
         // if not last cut back
@@ -123,12 +129,17 @@ module jar_holder_segment(is_first=true, is_last=false)
                 translate([body_x,horizontal_guage/2,0])
                 {
                     spice_jar_voroni(2*holders_clearance);
-                    %spice_jar_voroni();
+                    //spice_jar_voroni();
                 }
             
         }
 
         // if not first, cut base
+        if (! is_first)
+        {
+            translate([spice_jar_d/2+spice_jar_spacing-vertical_step,0,0])
+                spice_jar_voroni(2*holders_clearance);
+        } 
     }
 }
 
