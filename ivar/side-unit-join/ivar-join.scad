@@ -188,11 +188,11 @@ module part_joining_interface(has_nut=false)
             {
                 translate([0,0,pji_bt])
                     rotate([180,0,0])
-                    nut_hole(   d=part_joining_fastener_diameter,
-                                standard=part_joining_nut_standard,
-                                h_off=part_joining_bolt_l,
-                                clearance=0.2,
-                                align="t");
+                        nut_hole(   d=part_joining_fastener_diameter,
+                                    standard=part_joining_nut_standard,
+                                    s_off=part_joining_bolt_l,
+                                    clearance=0.1,
+                                    align="t");
             }
         }
 
