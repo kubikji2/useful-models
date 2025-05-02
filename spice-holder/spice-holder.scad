@@ -4,6 +4,10 @@ include<../solidpp/solidpp.scad>
 drawer_width = 124; // 122 including some covers
 drawer_depth = 62.5;
 
+// narrowing on the beginning
+drawer_narrow_width = 122;
+drawer_narrow_length = 40;
+
 // spice jars parameters
 spice_jar_d = 42;
 spice_jar_clearance = 0.5;
@@ -140,6 +144,10 @@ module jar_holder_segment(is_first=false, is_last=false)
             translate([spice_jar_d/2+spice_jar_spacing-vertical_step,0,0])
                 spice_jar_voroni(2*holders_clearance);
         } 
+        else
+        {
+            // TODO add cuts to narrow it down
+        }
     }
 }
 
