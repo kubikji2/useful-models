@@ -10,7 +10,7 @@ drawer_narrow_length = 40;
 
 // spice jars parameters
 spice_jar_d = 42;
-spice_jar_clearance = 0.5;
+spice_jar_clearance = 0.75;
 
 // variable parameters
 wt = 3;
@@ -26,7 +26,7 @@ echo(skew_angle);
 //echo(sin(skew_angle));
 
 holder_height = 40;
-holders_clearance = 0.25;
+holders_clearance = 0.15;
 // /holder_wt = 2;
 
 $fn=$preview ? 36: 72;
@@ -87,7 +87,8 @@ module jar_holder_segment(is_first=false, is_last=false)
     // main body
     difference()
     {
-        body_x = 2*vertical_step+spice_jar_spacing+spice_jar_d/2 + (is_first ? - holders_clearance : 0);
+        //body_x =  2*vertical_step+spice_jar_spacing+spice_jar_d/2 - holders_clearance;
+        body_x = is_first || is_last ? 2*vertical_step+spice_jar_spacing+spice_jar_d/2 - holders_clearance : 3*vertical_step - 2*  holders_clearance;
         cubepp([body_x, drawer_width, holder_height],
                 align="zx");
 
@@ -105,7 +106,8 @@ module jar_holder_segment(is_first=false, is_last=false)
             cubepp([_mx, drawer_width-2*wt, holder_height-wt-top_thickness], align=_ma);
 
         // add hole of spices
-        translate([spice_jar_d/2+spice_jar_spacing,0,wt])
+        spice_jar_offset = is_first ? spice_jar_d/2 + spice_jar_spacing : vertical_step;
+        translate([spice_jar_offset,0,wt])
         {
             mirrorpp([0,1,0], true)
                 translate([0,horizontal_guage/2,0])
@@ -141,8 +143,8 @@ module jar_holder_segment(is_first=false, is_last=false)
         // if not first, cut base
         if (! is_first)
         {
-            translate([spice_jar_d/2+spice_jar_spacing-vertical_step,0,0])
-                spice_jar_voroni(2*holders_clearance);
+            //translate([spice_jar_d/2+spice_jar_spacing-vertical_step+holders_clearance,0,0])
+            spice_jar_voroni(2*holders_clearance);
         } 
         else
         {
@@ -151,4 +153,6 @@ module jar_holder_segment(is_first=false, is_last=false)
     }
 }
 
-jar_holder_segment();
+jar_holder_segment(is_first=true, is_last=false);
+//translate([spice_jar_spacing+spice_jar_d/2+1*vertical_step,0,0])
+//    jar_holder_segment(is_first=false, is_last=false);
