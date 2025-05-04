@@ -1,11 +1,11 @@
 include<../solidpp/solidpp.scad>
 
 // drawer parameters
-drawer_width = 124; // 122 including some covers
+drawer_width = 124-0.5; // 122 including some covers
 drawer_depth = 62.5;
 
 // narrowing on the beginning
-drawer_narrow_width = 122;
+drawer_narrow_width = 122-0.5;
 drawer_narrow_length = 40;
 
 // spice jars parameters
@@ -14,7 +14,7 @@ spice_jar_clearance = 0.5;
 
 // variable parameters
 wt = 3;
-top_thickness = 5;
+top_thickness = 6;
 spice_jar_spacing = 5;
 
 horizontal_space = drawer_width - 2*spice_jar_d-2*spice_jar_spacing;
@@ -22,7 +22,7 @@ horizontal_guage = horizontal_space + spice_jar_d;
 vertical_step = sqrt((spice_jar_d+spice_jar_spacing)*(spice_jar_d+spice_jar_spacing)-(horizontal_space/2+spice_jar_d/2)*(horizontal_space/2+spice_jar_d/2));
 
 skew_angle = atan2(vertical_step, horizontal_guage/2);
-echo(skew_angle);
+//echo(skew_angle);
 //echo(sin(skew_angle));
 
 holder_height = 40;
@@ -147,6 +147,12 @@ module jar_holder_segment(is_first=false, is_last=false)
         else
         {
             // TODO add cuts to narrow it down
+            _t = (drawer_width-drawer_narrow_width)/2;
+            echo(_t);
+            mirrorpp([0,1,0], true)
+                translate([0,drawer_narrow_width/2,0])
+                    cubepp([drawer_narrow_length,_t,holder_height], align="xyz");
+
         }
     }
 }
