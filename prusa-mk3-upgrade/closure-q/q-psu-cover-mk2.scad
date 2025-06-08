@@ -13,18 +13,19 @@ VERSION = "Q2";
 include<../../deez-nuts/deez-nuts.scad>
 include<../../solidpp/solidpp.scad>
 
-
 //bottom thickness
 bt = 2.5;
 // wall thickness
 wt_x = 4.2;
 wt_y = 2.5;
 
+$fn=$preview ? 36 : 72;
+
 psu_x = 97;//89.4+3+4.6;
 //psu_x_translation = -3;
-psu_y = 49.3;
-psu_z_off = 26.5;
-psu_z_used = 35;
+psu_y = 50;//49.3;
+psu_z_off = 35;//26.5;// additional offset for housing cables
+psu_z_used = 35; // overlay to the PSU
 
 
 psu_int_depth = 1.6;
@@ -49,19 +50,20 @@ socket_bolt_g = socket_w+2*socket_bolt_x_offset;
 module socket_hole()
 {
     // left bolt hole
-    translate([-socket_bolt_x_offset,0,socket_h/2-socket_bolt_z_offset])
-        cylinderpp(d=socket_bolt_d, h=3*wt_y, zet="y");
+    translate([-socket_w/2-socket_bolt_x_offset, 0, 0])
+        cylinderpp(d=socket_bolt_d, h=3*wt_y, zet="y", align="y");
     
     // right bolt hole
-    translate([socket_w+socket_bolt_x_offset,0,socket_h/2-socket_bolt_z_offset])
-        cylinderpp(d=socket_bolt_d, h=3*wt_y, zet="y");
+    translate([socket_w/2+socket_bolt_x_offset, 0, 0])
+        cylinderpp(d=socket_bolt_d, h=3*wt_y, zet="y", align="y");
     
     // body hole
-    cubepp([socket_w, socket_d, socket_h], align="xyz");
+    cubepp([socket_w, socket_d, socket_h], align="y");
 }
 
+
 // switch interface
-switch_w = 20;
+switch_w = 19.5;
 switch_h = 12.5;
 
 module switch_hole()
@@ -76,7 +78,7 @@ module switch_hole()
 psu_bolt1_d1 = 8.2;
 psu_bolt1_d2 = 5;
 psu_bolt1_y_off = 27.8;
-psu_bolt1_z_off = 57;
+psu_bolt1_z_off = 30.5;//57;
 
 // bolts 2 and 3
 psu_bolts_d1 = 7;
@@ -86,28 +88,29 @@ psu_bolts_y_off = 3;
 
 // bolt 2
 psu_bolt2_x_off = 7.6;
-psu_bolt2_z_off = 53.7;
+psu_bolt2_z_off = 27.2;//53.7;
 
 // bolt 3
 psu_bolt3_x_off = 67.9;
-psu_bolt3_z_off = 57;
+psu_bolt3_z_off = 30.5;//57;
+
 
 module translate_to_bolt1()
 {
-    translate([cover_x,psu_bolt1_y_off,psu_bolt1_z_off])
+    translate([cover_x,psu_bolt1_y_off,psu_z_off+psu_bolt1_z_off])
         children();
 }
 
 module translate_to_bolt2()
 {
-    translate([psu_bolt2_x_off, cover_y+psu_bolts_y_off, psu_bolt2_z_off])
+    translate([psu_bolt2_x_off, cover_y+psu_bolts_y_off, psu_z_off+psu_bolt2_z_off])
         rotate([0,0,180])
             children();
 }
 
 module translate_to_bolt3()
 {
-    translate([psu_bolt3_x_off, cover_y+psu_bolts_y_off, psu_bolt3_z_off])
+    translate([psu_bolt3_x_off, cover_y+psu_bolts_y_off, psu_z_off+psu_bolt3_z_off])
         rotate([0,0,180])
             children();
 }
@@ -146,6 +149,9 @@ module psu_interface()
         cubepp([wt_x+psu_int_wall_reinforcement, 15, 3], align="xYz");
 }
 
+// cable hole
+cable_hole_w = 8;
+
 
 module psu_cover_body()
 {
@@ -153,59 +159,89 @@ module psu_cover_body()
     render()
     difference()
     {
-        // main body
         union()
         {
-            // main shape
-            cubepp([cover_x, cover_y, cover_z]);
+            difference()
+            {
+                // main body
+                union()
+                {
+                    // main shape
+                    cubepp([cover_x, cover_y, cover_z]);
+                    
+                    // TODO add stupid reinforcement
+
+                }
+                // cut for psu
+                translate([-wt_x, wt_y, bt+psu_z_off])
+                    cube([cover_x, psu_y, psu_z_used]);
+                
+                // inner cut
+                translate([wt_x+psu_int_wall_reinforcement,wt_y,bt])
+                    cube([cover_x-(wt_x+psu_int_wall_reinforcement)-wt_x, psu_y, psu_z_used+psu_z_off]);
+
+                // PSU interface 
+                // '-> bolt1 
+                translate_to_bolt1()
+                {
+                    // head 
+                    rotate([0,0,180])
+                        cylinderpp(d1=psu_bolt1_d1, d2=psu_bolt1_d2, h=3, zet="x", align="x");
+
+                    // shaft 
+                    cylinderpp(d=psu_bolt1_d2, h=3*wt_x, align="", zet="x");
+                }
+                // '-> bolt 2
+                translate_to_bolt2()
+                    psu_mounting_bolt();
+                // '-> bolt 3
+                translate_to_bolt3()
+                    psu_mounting_bolt();
+            }
+
+            translate([socket_w,psu_y/2+wt_y,bt])
+                mirrorpp([1,0,0], true)
+                    translate([-socket_w/2-socket_bolt_x_offset,0,0])
+                        difference()
+                        {
+                            _standard = "DIN562";
+                            _d = 3;
+                            _nh = get_nut_height(standard=_standard, d=_d);
+                            _nd = get_nut_diameter(standard=_standard, d=_d, is_inradius=true);
+                            _h = _nh+2;
+                            //translate([_nd/2,0,0])
+                            hull()
+                            {
+
+                                cubepp([_nd+2, _nd+2, _nh+2], align="z");
+                                cubepp([_nd+2*_h, _nd+2*_h, 0.01], align="z");
+                            }
+                            nut_hole(s_off=10,standard="DIN562", d=3);
+                            
+                            cylinder(d=socket_bolt_d, h=10);
+                        }
             
-            // TODO add stupid reinforcement
 
         }
-        // cut for psu
-        translate([-wt_x, wt_y, bt+psu_z_off])
-            cube([cover_x, psu_y, psu_z_used]);
-        
-        // inner cut
-        translate([wt_x+psu_int_wall_reinforcement,wt_y,bt])
-            cube([cover_x-(wt_x+psu_int_wall_reinforcement)-wt_x, psu_y, psu_z_used+psu_z_off]);
-
-        // PSU interface 
-        // '-> bolt1 
-        translate_to_bolt1()
-        {
-            // head 
-            rotate([0,0,180])
-                cylinderpp(d1=psu_bolt1_d1, d2=psu_bolt1_d2, h=3, zet="x", align="x");
-
-            // shaft 
-            cylinderpp(d=psu_bolt1_d2, h=3*wt_x, align="", zet="x");
-        }
-        // '-> bolt 2
-        translate_to_bolt2()
-            psu_mounting_bolt();
-        // '-> bolt 3
-        translate_to_bolt3()
-            psu_mounting_bolt();
-
 
         // socket hole
-        // TMP move down
-        translate([0,0,-1])
-        translate([55,0,1])
-            socket_hole();
+        translate([socket_w,psu_y/2+wt_y,0])
+            rotate([90,0,0])
+                socket_hole();
 
         // switch hole
-        translate([18,cover_y, 14.5])
-            switch_hole();
+        translate([wt_x+3*psu_x/4,wt_y+psu_y/4,0])
+            cubepp([switch_w, switch_h, 3*bt], align="");
+
+        // hole for the cables
+        translate([psu_x,wt_y+psu_y/2,psu_z_used])
+            cubepp([3*wt_x, psu_y/2 ,cable_hole_w], align="Z", mod_list=[round_edges(d=cable_hole_w,axes="yz")]);
 
     }
 
+    // side grooves to fit the PSU
     translate([psu_int_depth, wt_y, bt+psu_z_off])
         psu_interface();
-
-    // TODO add interface for psu
-
 
     //color("blue")
     
@@ -321,6 +357,7 @@ module PSU_COVER()
 
         translate([-3,50-16.4-17.6+15+0.9,2])cube([100,100,10]); //  bottom cutout
 
+        // TODO move
         // socket
         translate([5.5,0.5,0])
         {
@@ -336,6 +373,8 @@ module PSU_COVER()
             translate([48-4.5+37-0.5,3+15.6+0.5,40])
                 cylinder(r=2,h=50, $fn=8); 
         }
+
+
         
         // TODO -- move to the bottom 
         // switch
