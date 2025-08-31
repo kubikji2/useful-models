@@ -24,7 +24,7 @@ $fn=$preview ? 36 : 72;
 psu_x = 97;//89.4+3+4.6;
 //psu_x_translation = -3;
 psu_y = 50;//49.3;
-psu_z_off = 35;//26.5;// additional offset for housing cables
+psu_z_off = 45;//35;//26.5;// additional offset for housing cables
 psu_z_used = 35; // overlay to the PSU
 
 
@@ -103,14 +103,14 @@ module translate_to_bolt1()
 
 module translate_to_bolt2()
 {
-    translate([psu_bolt2_x_off, cover_y+psu_bolts_y_off, psu_z_off+psu_bolt2_z_off])
+    translate([psu_bolt2_x_off, cover_y, psu_z_off+psu_bolt2_z_off])
         rotate([0,0,180])
             children();
 }
 
 module translate_to_bolt3()
 {
-    translate([psu_bolt3_x_off, cover_y+psu_bolts_y_off, psu_z_off+psu_bolt3_z_off])
+    translate([psu_bolt3_x_off, cover_y, psu_z_off+psu_bolt3_z_off])
         rotate([0,0,180])
             children();
 }
@@ -118,14 +118,9 @@ module translate_to_bolt3()
 
 module psu_mounting_bolt()
 {
-    // top hole
-    cylinderpp(d=psu_bolts_d1, h=10, zet="y", align="Y");
+    rotate([90,0,0])
+        bolt_hole(standard="DIN7991",descriptor="M3x6", align="t");
     
-    // sloped    
-    cylinderpp(d2=psu_bolts_d2, d1=psu_bolts_d1, h=pus_bolts_h, zet="y", align="y");
-    
-    // shaft
-    cylinderpp(d=psu_bolts_d2, h=10, zet="y", align="y");
     
 }
 
@@ -150,7 +145,7 @@ module psu_interface()
 }
 
 // cable hole
-cable_hole_w = 8;
+cable_hole_w = 10;
 
 
 module psu_cover_body()
@@ -167,7 +162,8 @@ module psu_cover_body()
                 union()
                 {
                     // main shape
-                    cubepp([cover_x, cover_y, cover_z]);
+                    cubepp([cover_x, cover_y, cover_z],
+                            mod_list=[bevel_edges(2)]);
                     
                     // TODO add stupid reinforcement
 
@@ -199,7 +195,8 @@ module psu_cover_body()
                     psu_mounting_bolt();
             }
 
-            translate([socket_w,psu_y/2+wt_y,bt])
+            //translate([socket_w,psu_y/2+wt_y,bt])
+            translate([socket_w,socket_h/2+wt_y,bt])
                 mirrorpp([1,0,0], true)
                     translate([-socket_w/2-socket_bolt_x_offset,0,0])
                         difference()
@@ -225,7 +222,8 @@ module psu_cover_body()
         }
 
         // socket hole
-        translate([socket_w,psu_y/2+wt_y,0])
+        //#translate([socket_w,psu_y/2+wt_y,0])
+        translate([socket_w,socket_h/2+wt_y,0])
             rotate([90,0,0])
                 socket_hole();
 
@@ -235,7 +233,7 @@ module psu_cover_body()
 
         // hole for the cables
         translate([psu_x,wt_y+psu_y/2,psu_z_used])
-            cubepp([3*wt_x, psu_y/2 ,cable_hole_w], align="Z", mod_list=[round_edges(d=cable_hole_w,axes="yz")]);
+            cubepp([3*wt_x, psu_y/2, cable_hole_w], align="Z", mod_list=[round_edges(d=cable_hole_w,axes="yz")]);
 
     }
 
